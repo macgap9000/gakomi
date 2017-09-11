@@ -1,15 +1,22 @@
 <?php
 
-    require_once("settings/config.php");
+    // require_once("settings/config.php");
 
-    try
-    {
-        $pdo = new PDO($dsn, $db_user, $db_password);
-        echo "Połączenie nawiązane!";
-    }
-    catch (PDOException $ex)
-    {
-        echo 'Połączenie nie mogło zostać utworzone: ' . $ex->getMessage();
-    }
+    require_once __DIR__ . "/class/DatabaseController.php";
+
+    $DC = new DatabaseController();
+    $allOrders = $DC->getAllTokens();
+
+    echo "<pre>";
+    print_r($allOrders);
+    echo "</pre>";
+
+
+
+    require_once("class/TokenGenerator.php");
+
+    $TG = new TokenGenerator();
+    $token = $TG->getToken();
+    echo $token;
 
 ?>
