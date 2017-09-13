@@ -1,0 +1,6 @@
+Component version: master.zip (version 2.0.10)
+
+Download link: https://github.com/paragonie/random_compat
+-> https://github.com/paragonie/random_compat/archive/master.zip
+
+Project link: https://paragonie.com/projects

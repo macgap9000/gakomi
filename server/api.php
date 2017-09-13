@@ -19,4 +19,10 @@
     $token = $TG->getToken();
     echo $token;
 
+    echo "<br><br><br>";
+
+    echo "<pre>";
+    print_r($_GET);
+    echo "</pre>";
+
 ?>

@@ -1,0 +1,6 @@
+Component version: bootstrap-3.3.7-dist
+
+Download link: http://getbootstrap.com/docs/3.3/getting-started/#download
+-> https://github.com/twbs/bootstrap/releases/download/v3.3.7/bootstrap-3.3.7-dist.zip
+
+Project link: https://github.com/twbs/bootstrap

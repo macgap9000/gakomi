@@ -20,7 +20,10 @@
             // Przygotowanie obiektu PDO:
             try
             {
+                // Utworzenie obiektu PDO:
                 $this->pdo = new PDO($dsn, $db_user, $db_password);
+                // Wprowadzenie parametrów połączenia:
+                $this->pdo->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
                 echo 'Połączenie nawiązane!';
             }
             catch (PDOException $ex)
