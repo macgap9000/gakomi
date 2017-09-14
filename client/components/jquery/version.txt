@@ -1,0 +1,5 @@
+Component version: 1.12.4
+
+Download link: https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js
+
+Project link: https://github.com/jquery/jquery

@@ -6,3 +6,4 @@ Used projects:
     1. random_compat 2.0.10 (MIT) - https://github.com/paragonie/random_compat
 * client-side:
     1. bootstrap 3.3.7 (MIT) - https://github.com/twbs/bootstrap
+    2. jquery 1.12.4 (MIT) - https://github.com/jquery/jquery
