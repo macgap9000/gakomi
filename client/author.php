@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="pl">
   <head>
@@ -9,7 +10,7 @@
     <meta name="author" content="">
     <link rel="icon" href="graphics/icon/gakomi.ico">
 
-    <title>Gakomi - Start</title>
+    <title>Gakomi - Autor</title>
 
     <!-- Bootstrap core CSS -->
     <link href="components/bootstrap/css/bootstrap.min.css" rel="stylesheet">
@@ -42,10 +43,10 @@
         </div>
         <div id="navbar" class="collapse navbar-collapse">
           <ul class="nav navbar-nav">
-            <li class="active"><a href="index.php">Start</a></li>
-            <li><a href="stage1.php">Obliczenia</a></li>
+            <li><a href="index.php">Start</a></li>
+            <li><a href="step1.php">Obliczenia</a></li>
             <li><a href="results.php">Wyniki</a></li>
-            <li><a href="author.php">Autor</a></li>
+            <li class="active"><a href="author.php">Autor</a></li>
           </ul>
         </div><!--/.nav-collapse -->
       </div>
@@ -53,31 +54,13 @@
 
     <div class="container">
 
-      <div class="starter-template" style="padding-bottom: 0px; !important;">
-        <div>
-            <h1>Projekt Gakomi</h1>
-            <p class="lead">
-                Oprogramowanie rozwiązujące problem komiwojażera<br> 
-                działające w architekturze klient-serwer w oparciu o technologię REST.<br>
-            </p>
-        </div>
-        </div>
-
-        <div class="panel panel-default">
-            <div class="panel-heading">
-              <h3 class="panel-title">Komunikat powitalny</h3>
-            </div>
-            <div class="panel-body">
-              Witaj w aplikacji służącej do rozwiązywania problemu komiwojażera.<br>
-              Jej celem jest odnalezienie najkrótszej możliwej trasy, spośród wszystkich wprowadzonych punktów i odległości między nimi.<br>
-              <br>
-              Aby rozpocząć obliczenia, naciśnij przycisk "Obliczenia" znajdujący się w górnym menu, bądź <a href="stage1.php">kliknij tutaj</a>.<br>
-              Jeśli już wykonywałeś kiedyś obliczenia i chcesz zobaczyć ich wyniki, naciśnij przycisk "Wyniki" w górym menu, bądź <a href="results.php">kliknij tutaj</a>.<br>
-              <br>
-              Dziękuję za skorzystanie z aplikacji.<br>
-              Maciej Gapiński<br>
-            </div>
-        </div>
+      <div class="starter-template">
+        <h1>Projekt Gakomi</h1>
+        <p class="lead">
+            Oprogramowanie rozwiązujące problem komiwojażera<br> 
+            działające w architekturze klient-serwer w oparciu o technologię REST.<br>
+        </p>
+      </div>
 
     </div><!-- /.container -->
 

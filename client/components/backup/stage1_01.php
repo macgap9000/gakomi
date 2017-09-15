@@ -9,7 +9,7 @@
     <meta name="author" content="">
     <link rel="icon" href="graphics/icon/gakomi.ico">
 
-    <title>Gakomi - Start</title>
+    <title>Gakomi - Obliczenia (1)</title>
 
     <!-- Bootstrap core CSS -->
     <link href="components/bootstrap/css/bootstrap.min.css" rel="stylesheet">
@@ -42,8 +42,8 @@
         </div>
         <div id="navbar" class="collapse navbar-collapse">
           <ul class="nav navbar-nav">
-            <li class="active"><a href="index.php">Start</a></li>
-            <li><a href="stage1.php">Obliczenia</a></li>
+            <li><a href="index.php">Start</a></li>
+            <li class="active"><a href="stage1.php">Obliczenia</a></li>
             <li><a href="results.php">Wyniki</a></li>
             <li><a href="author.php">Autor</a></li>
           </ul>
@@ -57,25 +57,41 @@
         <div>
             <h1>Projekt Gakomi</h1>
             <p class="lead">
-                Oprogramowanie rozwiązujące problem komiwojażera<br> 
-                działające w architekturze klient-serwer w oparciu o technologię REST.<br>
+                Wprowadź zbiór podstawowych informacji,<br>
+                koniecznych do przeprowadzenia obliczeń.<br>
             </p>
         </div>
         </div>
 
+        <div class="well">
+          <b>Etap 1</b>
+        </div>
+
         <div class="panel panel-default">
             <div class="panel-heading">
-              <h3 class="panel-title">Komunikat powitalny</h3>
+              <h3 class="panel-title">Określenie ilości miast</h3>
             </div>
-            <div class="panel-body">
-              Witaj w aplikacji służącej do rozwiązywania problemu komiwojażera.<br>
-              Jej celem jest odnalezienie najkrótszej możliwej trasy, spośród wszystkich wprowadzonych punktów i odległości między nimi.<br>
-              <br>
-              Aby rozpocząć obliczenia, naciśnij przycisk "Obliczenia" znajdujący się w górnym menu, bądź <a href="stage1.php">kliknij tutaj</a>.<br>
-              Jeśli już wykonywałeś kiedyś obliczenia i chcesz zobaczyć ich wyniki, naciśnij przycisk "Wyniki" w górym menu, bądź <a href="results.php">kliknij tutaj</a>.<br>
-              <br>
-              Dziękuję za skorzystanie z aplikacji.<br>
-              Maciej Gapiński<br>
+            <div class="panel-body" style="padding-top:32px; padding-bottom:32px;">
+              <form action="" method="GET">
+                 <div class="form-group">
+                    <label>Wybierz ilość miast (punktów na mapie):</label>
+                    <select class="form-control">
+                      <option>1</option>
+                      <option>2</option>
+                      <option>3</option>
+                      <option>4</option>
+                    </select>
+                  </div>
+              </form>
+            </div>
+            <div class="panel-footer">
+              <div style="float:left;">
+                <!-- Brak dostępnego kroku wstecz -->
+              </div>
+              <div style="float:right;">
+                <button type="submit" class="btn btn-default btn-xs">Dalej <i class="glyphicon glyphicon-menu-right"></i></button>
+              </div>
+              <div style="clear:both;"></div>
             </div>
         </div>
 
