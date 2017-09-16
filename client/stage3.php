@@ -89,7 +89,7 @@
 <?php
 
   // Generowanie listy koniecznych linii do pobrania:
-  
+
 
 ?>
 
