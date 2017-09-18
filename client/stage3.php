@@ -1,8 +1,9 @@
 <?php
 
-  echo "<pre>";
-  print_r($_GET);
-  echo "</pre>";
+  // echo "<pre>";
+  // echo '<b>$_GET:</b><br>';
+  // print_r($_GET);
+  // echo "</pre>";
 
   // Sprawdzanie czy formularz został poprawnie przesłany:
   if (isset($_GET['numberOfCities']))
@@ -30,7 +31,6 @@
     else
     {
       // Przesłano pusty tekst. Przekierowanie do poprzedniego dokumentu PHP:
-      $numberOfCitiesErrorEmpty = true;
       header("Location: stage1.php");
       exit();
     }
@@ -88,10 +88,112 @@
 
 <?php
 
-  // Generowanie listy koniecznych linii do pobrania:
+  // Przepisanie do tablicy listy miast z tablicy $_GET:
+  $cities = $_GET['cities'];
 
+  // Przygotowanie pustej tablicy na linie (połączenia między miastami):
+  $lines = [];
+
+  // Przygotowanie iteratora ilości linii:
+  $lineNumber = 1;
+
+  // Przygotowywanie możliwych kombinacji miast:
+  for ($i = 1; $i <= $numberOfCities; $i++)
+  {
+    // Możliwe kombinacje bez powtórzeń z danym miastem:
+    $j = $i + 1;
+    for($j; $j <= $numberOfCities; $j++)
+    {
+      // Dodanie połaczenia miast do tablicy linii:
+      $lineName = $cities[$i]['name']."-".$cities[$j]['name'];
+      $lines[$lineNumber]['name'] = $lineName;
+      $lineNumber++;
+    }
+  }
+
+  // echo "<pre>";
+  // print_r($cities);
+  // print_r($lines);
+  // echo "</pre>";
 
 ?>
+
+<?php
+
+  // Sprawdzanie czy zostąły przesłane odległości między miastami:
+  if (isset($_GET['lines']))
+  {
+    // Przepisanie zawartości tablicy miast:
+    $lines = $_GET['lines'];
+
+    // Przygotowanie wskaźnika błędów "nie wpisano nic":
+    $numberOfErrorsNotEntered = 0;
+
+    // Weryfikacja, czy wpisano wszystkie odległości (wartości tekstowe):
+    foreach($lines as &$line)
+    {
+      // Jeśli długość linii jest pusta:
+      if (empty($line['distance']))
+      {
+        // To podnieś flagę błędu:
+        $line['isEmpty'] = true;
+
+        // Podbij wskaźnik ilości błędów:
+        $numberOfErrorsNotEntered++;
+      }
+      else
+      {
+        // Podano odległość między miastami:
+        $line['isEmpty'] = false;
+      }
+    }
+
+    // Przygotowanie wskaźnika błędów "wpisano wartość nieliczbową":
+    $numberOfErrorsNotNumeric = 0;
+
+    // Weryfikacja, czy wpisano wszystkie odległości (jako wartości liczbowe):
+    foreach($lines as &$line)
+    {
+      // Jeśli długość linii nie jest wartością liczbową:
+      if (!(is_numeric($line['distance'])))
+      {
+        // To podnieś flagę błędu:
+        $line['isNotNumeric'] = true;
+
+        // Podbij wskaźnik ilości błędów:
+        $numberOfErrorsNotNumeric++;
+      }
+      else
+      {
+        // Podano odległość między miastami jako wartość liczbowa:
+        $line['isNotNumeric'] = false;
+      }
+    }
+
+    // Sprawdzenie czy można przeslać fornularz
+    // na podstawie ilości błędów które wystąpiły:
+    if (($numberOfErrorsNotEntered == 0) && ($numberOfErrorsNotNumeric == 0))
+    {
+      // Wszystkie parametry z tablicy $_GET zaakceptowane.
+      // Pobierz jej zawartość i przygotuj treść parametrów do przekierowania:
+      $query = http_build_query($_GET);
+
+      // Wykonaj faktyczne przekierowanie:
+      header('Location: stage4.php'.'?'.$query);
+      exit();
+    }
+
+  }
+
+  // echo "<pre>";
+  // print_r($cities);
+  // print_r($lines);
+  // echo "</pre>";
+
+?>
+
+
+
 
 <!DOCTYPE html>
 <html lang="pl">
@@ -168,7 +270,8 @@
               </div>
               <div class="panel-body" style="padding-top:32px; padding-bottom:32px;">
                 <div class="well">
-                  Ilość wprowadzonych miast: <b><?php echo $numberOfCities; ?></b><br>
+                  Ilość wprowadzonych miast: <b><?php echo $numberOfCities; ?></b>
+                  <input type="hidden" name="numberOfCities" value="<?php if (isset($numberOfCities)) echo $numberOfCities; ?>"><br>
                   Wprowadzone miasta:<b>
                   <?php 
                     // Ustawienie iteratora na pierwszą wartość:
@@ -191,6 +294,10 @@
                         echo $city['name'].".";
                       }
 
+                      // Dodanie ukrytego pola formularza, by można było raz wypisane miasta
+                      // przesłać ponownie do tego samego pliku za pomocą $_GET:
+                      echo '<input type="hidden" name="cities['.$i.'][name]" value="'.$city['name'].'">';
+
                       // Inkrementacja licznika - w celu przetwarzania następnego wpisu:
                       $i++;
                     }
@@ -202,16 +309,80 @@
                     <table class="table table-striped table-bordered table-hover" style="margin-bottom:5px;">
                       <tbody>
                         <?php
-                          // Drukowanie tabelki w zależności od ilości miast:
-                          for($i=1; $i<=$numberOfCities; $i++)
+                          // Określenie ilości połączeń (linii):
+                          $numberOfLines = count($lines);
+
+                          // Drukowanie tabelki w zależności od ilości połączeń (linii):
+                          for($i=1; $i<=$numberOfLines; $i++)
                           {
+                            // Przygotowanie wartości:
+                            if (isset($lines))
+                            {
+                              // Przygotowanie nazwy miasta:
+                              $lineName = $lines[$i]['name'];
+
+                              // Przepisanie danych do zmiennych (o ile one istnieją:
+                              if (isset($lines[$i]['distance'])) 
+                              { 
+                                $lineDistance = $lines[$i]['distance'];
+                              }
+                              else
+                              {
+                                $lineDistance = "";
+                              }
+                              
+                              if (isset($lines[$i]['isEmpty']))
+                              {
+                                $lineDistanceNotEnteredError = $lines[$i]['isEmpty'];
+                              }
+                              else
+                              {
+                                $lineDistanceNotEnteredError = "";
+                              }
+                              
+                              if (isset($lines[$i]['isNotNumeric']))
+                              {
+                                $lineDistanceNotNumericError = $lines[$i]['isNotNumeric'];
+                              }
+                              else
+                              {
+                                $lineDistanceNotNumericError = "";
+                              }
+
+                              // Analiza błędów:
+                              if ($lineDistanceNotEnteredError == true)
+                              {
+                                // Nie wprowadzono długości linii (odległości między miastami):
+                                $lineErrorClass = 'has-error';
+                                $lineErrorMessage = '<label class="control-label" for="inputError">Wprowadź odległość.</label>';
+                              }
+                              elseif ($lineDistanceNotNumericError == true)
+                              {
+                                // Wprowadzona długość linii jest wartością nieliczbową:
+                                $lineErrorClass = 'has-error';
+                                $lineErrorMessage = '<label class="control-label" for="inputError">Wprowadź wartość liczbową.</label>';
+                              }
+                              else
+                              {
+                                // Nie wystąpiły żadne błędy:
+                                $lineErrorClass = '';
+                                $lineErrorMessage = '';
+                              }
+                            }
+
                             echo '
                                     <tr>
-                                      <td style="vertical-align:middle;">Nazwa miasta '.$i.':</td>
-                                      <td><input class="form-control" name="cityName'.$i.'"></td>
+                                      <td style="vertical-align:middle;">
+                                      '.$lineName.':
+                                      <input type="hidden" name="lines['.$i.'][name]" value="'.$lineName.'">
+                                      </td>
+                                      <td>
+                                        <div class="form-group '.$lineErrorClass.'" style="margin:0px;">
+                                          <input class="form-control" name="lines['.$i.'][distance]" value="'.$lineDistance.'">'.$lineErrorMessage.'
+                                        </div>
+                                      </td>
                                     </tr>
                             ';
-
                           }
                         ?>
                       </tbody>

@@ -29,8 +29,7 @@
     }
     else
     {
-      // Przesłano pusty tekst. Przekierowanie do poprzedniego dokumentu PHP:
-      $numberOfCitiesErrorEmpty = true;
+      // Przesłano pusty tekst. Przekierowanie do poprzedniego dokumentu PHP:      
       header("Location: stage1.php");
       exit();
     }
