@@ -88,27 +88,65 @@
 
 <?php
 
-  // Przepisanie do tablicy listy miast z tablicy $_GET:
-  $cities = $_GET['cities'];
-
-  // Przygotowanie pustej tablicy na linie (połączenia między miastami):
-  $lines = [];
-
-  // Przygotowanie iteratora ilości linii:
-  $lineNumber = 1;
-
-  // Przygotowywanie możliwych kombinacji miast:
-  for ($i = 1; $i <= $numberOfCities; $i++)
+  // Sprawdzanie czy zostały przesłane odległości między miastami:
+  if (isset($_GET['lines']))
   {
-    // Możliwe kombinacje bez powtórzeń z danym miastem:
-    $j = $i + 1;
-    for($j; $j <= $numberOfCities; $j++)
+    // Przepisanie zawartości tablicy miast:
+    $lines = $_GET['lines'];
+   
+    // Przygotowanie wskaźnika błędów "nie wpisano nic":
+    $numberOfErrorsNotEntered = 0;
+
+    // Weryfikacja, czy wpisano wszystkie odległości (wartości tekstowe):
+    foreach($lines as $line)
     {
-      // Dodanie połaczenia miast do tablicy linii:
-      $lineName = $cities[$i]['name']."-".$cities[$j]['name'];
-      $lines[$lineNumber]['name'] = $lineName;
-      $lineNumber++;
+      // Jeśli nazwa linii długość i/lub linii jest pusta:
+      if ((empty($line['name'])) || (empty($line['distance'])))
+      {
+        // Podbij wskaźnik ilości błędów:
+        $numberOfErrorsNotEntered++;
+      }
     }
+
+    // Przygotowanie wskaźnika błędów "wpisano wartość nieliczbową":
+    $numberOfErrorsNotNumeric = 0;
+
+    // Weryfikacja, czy wpisano wszystkie odległości (jako wartości liczbowe):
+    foreach($lines as $line)
+    {
+      // Jeśli długość linii nie jest wartością liczbową:
+      if (!(is_numeric($line['distance'])))
+      {
+        // Podbij wskaźnik ilości błędów:
+        $numberOfErrorsNotNumeric++;
+      }
+    }
+
+    // Sprawdzenie stanu wskaźników błędów.
+    // Jeśli któryś z nich jest większy od zera, oznacza to, że nie przesłano wszystkich oczekiwanych linii (połączeń):
+    if (($numberOfErrorsNotEntered > 0) || ($numberOfErrorsNotNumeric > 0))
+    {
+      // Wystąpiły błędy podczas walidacji. Przekieruj do poprzedniego dokumentu:
+      // Ale najpierw przygotuj zbiór parametrów dla przekierowania:
+      $array['numberOfCities'] = $_GET['numberOfCities'];
+      $array['cities'] = $_GET['cities'];
+      $query = http_build_query($array);
+
+      // Wykonaj faktyczne przekierowanie:
+      header('Location: stage3.php'.'?'.$query);
+    }
+  }
+  else
+  {
+    // W ogóle nie pojawiła się tablica połączeń (linii) w tablicy $_GET.
+    // Wykonaj natychmiastowe przekierowanie do poprzedniego dokumentu PHP:
+    // Ale najpierw przygotuj zbiór parametrów do przekierowania:
+    $array['numberOfCities'] = $_GET['numberOfCities'];
+    $array['cities'] = $_GET['cities'];
+    $query = http_build_query($array);
+
+    // Wykonaj faktyczne przekierowanie:
+    header('Location: stage3.php'.'?'.$query);
   }
 
   // echo "<pre>";
@@ -120,80 +158,43 @@
 
 <?php
 
-  // Sprawdzanie czy zostąły przesłane odległości między miastami:
-  if (isset($_GET['lines']))
+  // Sprawdzenie czy zostało przesłane (wskazane) miasto startowe:
+  if (isset($_GET['initialCityName']))
   {
-    // Przepisanie zawartości tablicy miast:
-    $lines = $_GET['lines'];
+    // Przepisanie zawartości do zmiennej:
+    $initialCityName = $_GET['initialCityName'];
 
-    // Przygotowanie wskaźnika błędów "nie wpisano nic":
-    $numberOfErrorsNotEntered = 0;
-
-    // Weryfikacja, czy wpisano wszystkie odległości (wartości tekstowe):
-    foreach($lines as &$line)
+    // Weryfikacja przy przesłano jakikolwiek tekst:
+    if (empty($initialCityName))
     {
-      // Jeśli długość linii jest pusta:
-      if (empty($line['distance']))
-      {
-        // To podnieś flagę błędu:
-        $line['isEmpty'] = true;
-
-        // Podbij wskaźnik ilości błędów:
-        $numberOfErrorsNotEntered++;
-      }
-      else
-      {
-        // Podano odległość między miastami:
-        $line['isEmpty'] = false;
-      }
-    }
-
-    // Przygotowanie wskaźnika błędów "wpisano wartość nieliczbową":
-    $numberOfErrorsNotNumeric = 0;
-
-    // Weryfikacja, czy wpisano wszystkie odległości (jako wartości liczbowe):
-    foreach($lines as &$line)
-    {
-      // Jeśli długość linii nie jest wartością liczbową:
-      if (!(is_numeric($line['distance'])))
-      {
-        // To podnieś flagę błędu:
-        $line['isNotNumeric'] = true;
-
-        // Podbij wskaźnik ilości błędów:
-        $numberOfErrorsNotNumeric++;
-      }
-      else
-      {
-        // Podano odległość między miastami jako wartość liczbowa:
-        $line['isNotNumeric'] = false;
-      }
-    }
-
-    // Sprawdzenie czy można przeslać fornularz
-    // na podstawie ilości błędów które wystąpiły:
-    if (($numberOfErrorsNotEntered == 0) && ($numberOfErrorsNotNumeric == 0))
-    {
-      // Wszystkie parametry z tablicy $_GET zaakceptowane.
-      // Pobierz jej zawartość i przygotuj treść parametrów do przekierowania:
-      $query = http_build_query($_GET);
+      // Przesłano pusty tekst. Przekierowanie do poprzedniego dokumentu PHP.
+      // Ale najpierw przygotuj zbiór parametów do przekierowania:
+      $array['numberOfCities'] = $_GET['numberOfCities'];
+      $array['cities'] = $_GET['cities'];
+      $array['lines'] = $_GET['lines'];
+      $query = http_build_query($array);
 
       // Wykonaj faktyczne przekierowanie:
       header('Location: stage4.php'.'?'.$query);
       exit();
-    }
+    }    
+  }
+  else
+  {
+    // Nie przesłano oczekiwanej wartości w tablicy $_GET.
+    // Wykonaj natychmiastowe przekierowanie do poprzedniego dokumentu PHP.
+    // Ale najpierw przygotuj zbiór parametrów do przekierowania:
+    $array['numberOfCities'] = $_GET['numberOfCities'];
+    $array['cities'] = $_GET['cities'];
+    $array['lines'] = $_GET['lines'];
+    $query = http_build_query($array);
 
+    // Wykonaj faktyczne przekierowanie:
+    header('Location: stage4.php'.'?'.$query);
+    exit();
   }
 
-  // echo "<pre>";
-  // print_r($cities);
-  // print_r($lines);
-  // echo "</pre>";
-
 ?>
-
-
-
 
 <!DOCTYPE html>
 <html lang="pl">
@@ -206,7 +207,7 @@
     <meta name="author" content="">
     <link rel="icon" href="graphics/icon/gakomi.ico">
 
-    <title>Gakomi - Obliczenia (3)</title>
+    <title>Gakomi - Obliczenia (5)</title>
 
     <!-- Bootstrap core CSS -->
     <link href="components/bootstrap/css/bootstrap.min.css" rel="stylesheet">
@@ -260,15 +261,20 @@
         </div>
 
         <div class="well">
-          Etap 1 &raquo; Etap 2 &raquo; <b>Etap 3</b>
+          Etap 1 &raquo; Etap 2 &raquo; Etap 3 &raquo; Etap 4 &raquo; <b>Etap 5</b>
         </div>
 
-        <form action="" method="GET">
+        <form action="printGET.php" method="GET">
           <div class="panel panel-default">
               <div class="panel-heading">
-                <h3 class="panel-title">Wprowadź odległości między miastami</h3>
+                <h3 class="panel-title">Podsumowanie</h3>
               </div>
               <div class="panel-body" style="padding-top:32px; padding-bottom:32px;">
+              
+                <div class="form-group">
+                  <p style="font-weight:bold;">Zbiór dotychczas zgromadzonych informacji:</p>
+                </div>              
+
                 <div class="well">
                   Ilość wprowadzonych miast: <b><?php echo $numberOfCities; ?></b>
                   <input type="hidden" name="numberOfCities" value="<?php if (isset($numberOfCities)) echo $numberOfCities; ?>"><br>
@@ -301,97 +307,41 @@
                       // Inkrementacja licznika - w celu przetwarzania następnego wpisu:
                       $i++;
                     }
-                  ?></b>
+                  ?></b><br>
+                  Odległości pomiędzy miastami (punktami na mapie):<b>
+                  <ul style="margin-bottom:0px;">
+                  <?php
+                    // Ustawienie iteratora na pierwszą wartość:
+                    $i = 1;
+
+                    // Drukowanie na ekran listy miast/punktów na mapie/linii:
+                    foreach($lines as $line)
+                    {
+                      // Przepisanie do zmiennych:
+                      $lineName = $line['name'];
+                      $lineDistance = $line['distance'];
+
+                      // Drukowanie na ekran:
+                      echo '<li>'.$lineName.' ('.$lineDistance.' km)</li>
+                      <input type="hidden" name="lines['.$i.'][name]" value="'.$lineName.'">
+                      <input type="hidden" name="lines['.$i.'][distance]" value="'.$lineDistance.'">';
+
+                      // Inkrementacja licznika - w celu przetwarzania następnego wpisu:
+                      $i++;
+                    }
+                  ?>
+                  </ul></b>
+                Miasto początkowe: <b><?php echo $initialCityName; ?></b>
+                <input type="hidden" name="initialCityName" value="<?php if (isset($initialCityName)) echo $initialCityName; ?>"><br>
                 </div>
+
                 <div class="form-group">
-                  <label>Wprowadź odległości pomiędzy miastami (punktami na mapie) wyrażone w kilometrach:</label>
-                  <div class="table-responsive">
-                    <table class="table table-striped table-bordered table-hover" style="margin-bottom:5px;">
-                      <tbody>
-                        <?php
-                          // Określenie ilości połączeń (linii):
-                          $numberOfLines = count($lines);
-
-                          // Drukowanie tabelki w zależności od ilości połączeń (linii):
-                          for($i=1; $i<=$numberOfLines; $i++)
-                          {
-                            // Przygotowanie wartości:
-                            if (isset($lines))
-                            {
-                              // Przygotowanie nazwy miasta:
-                              $lineName = $lines[$i]['name'];
-
-                              // Przepisanie danych do zmiennych (o ile one istnieją:
-                              if (isset($lines[$i]['distance'])) 
-                              { 
-                                $lineDistance = $lines[$i]['distance'];
-                              }
-                              else
-                              {
-                                $lineDistance = "";
-                              }
-                              
-                              if (isset($lines[$i]['isEmpty']))
-                              {
-                                $lineDistanceNotEnteredError = $lines[$i]['isEmpty'];
-                              }
-                              else
-                              {
-                                $lineDistanceNotEnteredError = "";
-                              }
-                              
-                              if (isset($lines[$i]['isNotNumeric']))
-                              {
-                                $lineDistanceNotNumericError = $lines[$i]['isNotNumeric'];
-                              }
-                              else
-                              {
-                                $lineDistanceNotNumericError = "";
-                              }
-
-                              // Analiza błędów:
-                              if ($lineDistanceNotEnteredError == true)
-                              {
-                                // Nie wprowadzono długości linii (odległości między miastami):
-                                $lineErrorClass = 'has-error';
-                                $lineErrorMessage = '<label class="control-label" for="inputError">Wprowadź odległość.</label>';
-                              }
-                              elseif ($lineDistanceNotNumericError == true)
-                              {
-                                // Wprowadzona długość linii jest wartością nieliczbową:
-                                $lineErrorClass = 'has-error';
-                                $lineErrorMessage = '<label class="control-label" for="inputError">Wprowadź wartość liczbową.</label>';
-                              }
-                              else
-                              {
-                                // Nie wystąpiły żadne błędy:
-                                $lineErrorClass = '';
-                                $lineErrorMessage = '';
-                              }
-                            }
-
-                            echo '
-                                    <tr>
-                                      <td style="vertical-align:middle;">
-                                      '.$lineName.':
-                                      <input type="hidden" name="lines['.$i.'][name]" value="'.$lineName.'">
-                                      </td>
-                                      <td>
-                                        <div class="form-group '.$lineErrorClass.'" style="margin:0px;">
-                                          <input class="form-control" name="lines['.$i.'][distance]" value="'.$lineDistance.'">'.$lineErrorMessage.'
-                                        </div>
-                                      </td>
-                                    </tr>
-                            ';
-                          }
-                        ?>
-                      </tbody>
-                    </table>
-                  </div>
-                  
-
-                  <p>Oczekiwana wartość liczbowa kilometrów. Na przykład: 50</p>
+                  <p>Wszystkie niezbędne dane, konieczne do rozwiązania problemu komiwojażera zostały zebrane są gotowe do dalszego przetwarzania.</p>
+                  <p>Zostaną one specjalnie opakowane a następnie przesłane do serwera API wykonującego obliczenia.</b></p>
+                  <p>Upewnij się czy zostały one wpisane prawidłowo, gdyż w dalszym etapie poprawienie ich nie będzie możliwe.</p>
+                  <p>Aby kontynuować, naciśnij przycisk <b>Dalej</b></p>
                 </div>
+
               </div>
               <div class="panel-footer">
                 <div style="float:left;">
