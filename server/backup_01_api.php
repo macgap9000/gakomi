@@ -9,10 +9,7 @@
 
     */
 
-    // Podłączanie zalezności:
-    
-        // Walidator danych wejściowych:
-        require_once __DIR__ . "/class/OrderValidator.php";
+    // Podłączanie zalezności:    
 
         // Kontroler bazy danych:
         //require_once __DIR__ . "/class/DatabaseController.php";
@@ -22,7 +19,7 @@
 
 
     // Ustawienie stałej wersji protokołu HTTP:
-    define("HTTP_VERSION", "HTTP/1.1");
+    //define("HTTP_VERSION", "HTTP/1.1");
 
     // Odbieranie konkretnych żądań na podstawie użytej metody HTTP:
     // POST - przyjmuje zlecenie (order) na wykonanie obliczeń trasy komiwojażera
@@ -38,32 +35,39 @@
         // zlecić API wykonanie obliczeń problemu komiwojażera
         // (znalezienie najkrótszej możliwej trasy):
         case "POST":
-            // Przepisanie do zmiennej zawartości POST (odebranych danych):
-            $postBody = file_get_contents("php://input");
-            // Ponieważ odebrane dane były zapisane w formacie JSON, należy
-            // je teraz zdekodować i utworzyć na podstawie ich obiekt:
-            $objOrder = json_decode($postBody);
-            // Przekazanie obiektu zamówienia (zawierającego dostarczone dane)
-            // do obiektu, który zajmie się walidacją danych:
-            $OrderValidator = new OrderValidator($objOrder);
-            // Wykonanie walidacji danych wejściowych:
-            $result = $OrderValidator->validate();
-            
-            echo "<pre>".var_dump($result)."</pre>";
-            
 
+            // $wejscie = file_get_contents("php://input");
+            // $wejscie = $_POST;
+            // var_dump($wejscie);
+
+
+            // print_r($_POST);
+            $postBody = file_get_contents("php://input");
+            $postBody = json_decode($postBody);
+            var_dump($postBody);
+
+            // $json = json_encode($postBody);
+            // echo $json;
+
+            //var_dump($_POST);
+            //echo "POST!<br><br>";
+            // http_response_code(200);
+            // header("Content-Type: application/json; charset=utf-8");
+
+
+            // $json = json_encode($_POST);
+            // echo $json;
             break;
 
         // Wybrano metodę HTTP typu GET. Użytkownik więc chciałby
         // uzyskać od API wyniki swoich obliczeń na postawie dostarczonego tokena:
         case "GET":
             //echo "GET!";
-            /*
             http_response_code(200);
             header("Content-Type: application/json; charset=utf-8");
             $json = json_encode($_GET);
             echo $json;
-            */
+
             break;
 
         // Wybrano każdą inną metodę HTTP. Ponieważ są one nieobsługiwane,
@@ -72,7 +76,6 @@
         // https://www.tutorialspoint.com/http/http_methods.htm
         // https://www.tutorialspoint.com/http/http_status_codes.htm
         default:
-            /*
             // Ustawienie nagłówka HTTP i kodu błędu:
             http_response_code(405);
             // Ustawienie typu danych (JSON) i kodowania):
@@ -83,7 +86,6 @@
             $json = json_encode($response);
             // Wydrukowanie odpowiedzi:
             echo $json;
-            */
             break;
     }
 

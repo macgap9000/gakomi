@@ -1,19 +1,19 @@
 <?php
 
-    // $json = '{
-    //     "numberOfCities": 3,
-    //     "cities": [
-    //       "Kutno",
-    //       "Warszawa",
-    //       "Poznań"
-    //     ],
-    //     "lines": {
-    //       "Kutno-Warszawa": 10,
-    //       "Kutno-Poznań": 20,
-    //       "Warszawa-Poznań": 30
-    //     },
-    //     "initialCityName": "Kutno"
-    //   }';
+    $json = '{
+        "numberOfCities": 3,
+        "cities": [
+          "Kutno",
+          "Warszawa",
+          "Poznań"
+        ],
+        "lines": {
+          "Kutno-Warszawa": 10,
+          "Kutno-Poznań": 20,
+          "Warszawa-Poznań": 30
+        },
+        "initialCityName": "Kutno"
+      }';
 
     // $result = json_decode($json);
 
