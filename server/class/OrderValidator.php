@@ -447,7 +447,7 @@
 
                     // Krok 8B. Sprawdzenie czy wartość przechowywana w polu nazwy miasta startowego
                     // znajduje się w zadeklarowanej liście miast 'cities':
-                    $initialCityName_existsOnCitiesList = in_array($this->objOrder->cities)
+                    $initialCityName_existsOnCitiesList = in_array($this->objOrder->initialCityName, $this->objOrder->cities);
                     // Jeśli nie znajduje się miasto na tamtej liście miast:
                     if ($initialCityName_existsOnCitiesList == false)
                     {
