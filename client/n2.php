@@ -11,6 +11,7 @@
         "Kutno-Warszawa" => 10,
         "Kutno-Poznan" => 20,
         "Warszawa-Poznan" => 30
+        //,"asd" => "kupa"
     ];
     $obj->initialCityName = "Kutno";
 

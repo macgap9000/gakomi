@@ -345,7 +345,7 @@
                     // Jeśli pole nie jest obiektem:
                     if ($lines_isObject == false)
                     {
-                        // Zwróć stosowny wynik walidacji (lista miast nie jest tablicą):
+                        // Zwróć stosowny wynik walidacji (połączeń połączeń (linii) między miastami 'lines' nie):
                         $objOrderValidationResult->success = false;
                         $objOrderValidationResult->errorCode = "EV020";
                         $objOrderValidationResult->message = "Pole listy połączeń (linii) między miastami 'lines' nie jest typem obiektowym.";
@@ -353,135 +353,120 @@
                         return $objOrderValidationResult;                         
                     }
 
-
-                    $tempArray = (array) $this->objOrder->lines;
-                    
-                    echo "<pre>";
-                    print_r($tempArray);
-                    echo "</pre>";
-
-                    foreach ($tempArray as $key => $value)
+                    // Krok 7B. Sprawdzenie czy pole listy połączeń (linii) między miastami "lines"
+                    // zawiera tylko i wyłącznie elementy będące typu "klucz - wartość":
+                    //
+                    // Wprowadzenie mechanizmu refleksji obiektu:
+                    $reflect = new ReflectionObject($this->objOrder->lines);
+                    // Uzyskanie listy wszystkich dostępnych pól obiektu:
+                    $properties = $reflect->getProperties();
+                    // Zliczenie liczby wszystkich dostępnych pól obiektu:
+                    $lines_numberOfElements = count($properties);
+                    //
+                    // Wprowadzenie licznika liczby pól typu "klucz - wartość":
+                    $lines_numberOfElements_keyValuePairs = 0;
+                    // Przeliczenie ilości pól typu "klucz - wartość":
+                    foreach ($this->objOrder->lines as $key => $value)
                     {
-                        echo "<br><br>";
-                        echo "Nazwa klucza: ".$key." wartość: ".$value."<br>";
-                        echo "Typ klucza: ".gettype($key)." Typ wartości: ".gettype($value)."<br>";
-                        echo "<br><br>";
+                        $lines_numberOfElements_keyValuePairs++;
+                    }
+                    //
+                    // Jeżeli ilość wszystkich elementów jest różna od ilości elementów typu "klucz - wartość"
+                    // oznacza to, że wśród wszystkich elemenów były jeszcze inne elementy, które nie były typu "klucz-wartość":
+                    if (!($lines_numberOfElements == $lines_numberOfElements_keyValuePairs))
+                    {
+                        // Zwróć stosowny wynik walidacji (lista linii (połączeń między miastami) nie jest obiektem):
+                        $objOrderValidationResult->success = false;
+                        $objOrderValidationResult->errorCode = "EV021";
+                        $objOrderValidationResult->message = "Pole listy połączeń (linii) między miastami 'lines' zawiera dane innego typu niż 'klucz - wartość'.";
+                        // Zwróć obiekt wyniku walidacji:
+                        return $objOrderValidationResult;  
                     }
 
+                    // Krok 7C. Sprawdzenie czy pole listy połączeń (linii) między miastami "lines"
+                    // zawiera tylko i wyłącznie klucze będącymi typu string
+                    // oraz wartości, będące tylko i wartościami liczbowymi (dozwolone są liczby całkowite i zmiennoprzecinkowe):
+                    //
+                    // Przygotowanie kolejno liczników - licznik kluczy nie-stringowych i licznik wartości nie-liczbowych:
+                    $lines_numberOfKeys_notStrings = 0;
+                    $lines_numberOfValues_notNumeric = 0;
+                    // Przeszukiwanie elementów pod kątem wspomnianych wyżej warunków:
+                    foreach ($this->objOrder->lines as $key => $value)
+                    {
+                        // Jeśli klucz nie jest typu string:
+                        if (!(is_string($key)))
+                        {
+                            // Podbij wartość licznika kluczy nie-stringowych:
+                            $lines_numberOfKeys_notStrings++;
+                        }
+                        // Jeśli wartość nie jest liczbowa:
+                        if (!(is_numeric($value)))
+                        {
+                            // Podbij wartość licznika wartości nie-liczbowy:
+                            $lines_numberOfValues_notNumeric++;
+                        }
+                    }
+                    // Jeśli wartość któregokolwiek z liczników (a więc odnalezionych błędnych wartości) jest większa od zera
+                    // oznacza to, że zostały wprowadzone błędne wartości i należy przerwać proces walidacji:
+                    if ($lines_numberOfKeys_notStrings > 0)
+                    {
+                        // Zwróć stosowny wynik walidacji (lista linii (połączeń między miastami) zawiera klucze nie będące typu string):
+                        $objOrderValidationResult->success = false;
+                        $objOrderValidationResult->errorCode = "EV022";
+                        $objOrderValidationResult->message = "Pole listy połączeń (linii) między miastami 'lines' zawiera klucze, które nie są typu string.";
+                        // Zwróć obiekt wyniku walidacji:
+                        return $objOrderValidationResult;
+                    }
+                    if ($lines_numberOfValues_notNumeric > 0)
+                    {
+                        // Zwróć stosowny wynik walidacji (lista linii (połączeń między miastami) zawiera wartości nie będące wartościami liczbowymi):
+                        $objOrderValidationResult->success = false;
+                        $objOrderValidationResult->errorCode = "EV023";
+                        $objOrderValidationResult->message = "Pole listy połączeń (linii) między miastami 'lines' zawiera wartości, które nie są liczbowe.";
+                        // Zwróć obiekt wyniku walidacji:
+                        return $objOrderValidationResult;
+                    }
 
-
-
-                    // foreach ($tempArray as $element)
-                    // {
-
-                    //     echo "Typ elementu: ".gettype($element)."<br><br>";
-                    //     //echo "<br><br>".var_dump($this->objOrder->lines)." Key name: ".key($this->objOrder->lines)."<br><br>";
-                    // }
                     
+                // Krok 8. Sprawdzenie czy dane przechowywane w polu nazwy miasta startowego "initialCityName"
+                // są zgodne z oczekiwanymi typami i wartościami. Jeśli nie, to nie można prowadzić dalej walidacji:
 
-                    
-                    
-                    // // NIE DZIAŁA:
-                    // foreach ($this->objOrder->lines as $element)
-                    // {
-                    //     // NAZWA KLUCZA TO NAZWA KLUCZA
-                    //     // JEGO WARTOŚĆ TO INTEGER!!!
-                    //     echo "Typ elementu: ".gettype($element)."<br><br>";
-                    //     //echo "<br><br>".var_dump($this->objOrder->lines)." Key name: ".key($this->objOrder->lines)."<br><br>";
-                    // }
-                    
-                    
+                    // Krok 8A. Sprawdzenie czy wartość przechowywana w polu nazwy miasta startowego
+                    // jest wartością typu string:
+                    $initialCityName_isString = is_string($this->objOrder->initialCityName);
+                    // Jeśli wartość ta nie jest typu string:
+                    if ($initialCityName_isString == false)
+                    {
+                        // Zwróć stosowny wynik walidacji (wartość przechowana w polu nazwa miasta startowego nie jest stringiem):
+                        $objOrderValidationResult->success = false;
+                        $objOrderValidationResult->errorCode = "EV030";
+                        $objOrderValidationResult->message = "Pole nazwy miasta startowego 'initialCityName' nie jest typu string.";
+                        // Zwróć obiekt wyniku walidacji:
+                        return $objOrderValidationResult;
+                    }
 
+                    // Krok 8B. Sprawdzenie czy wartość przechowywana w polu nazwy miasta startowego
+                    // znajduje się w zadeklarowanej liście miast 'cities':
+                    $initialCityName_existsOnCitiesList = in_array($this->objOrder->cities)
+                    // Jeśli nie znajduje się miasto na tamtej liście miast:
+                    if ($initialCityName_existsOnCitiesList == false)
+                    {
+                        // Zwróć stosowny wynik walidacji (nazwa miasta przechowana w polu nazwa miasta startowego nie znajduje się na zadeklarowanej liście miast 'cities'):
+                        $objOrderValidationResult->success = false;
+                        $objOrderValidationResult->errorCode = "EV031";
+                        $objOrderValidationResult->message = "Pole nazwy miasta startowego 'initialCityName' zawiera nazwę miasta, nie znajdującego się na liście miast 'cities'.";
+                        // Zwróć obiekt wyniku walidacji:
+                        return $objOrderValidationResult;
+                    }
 
-
-                    //echo key($this->objOrder->lines);
-
-
-                // $niewiadomoco = (array) $this->objOrder->lines;
-                // $niewiadomoco["Kutno-Warszawa"] = 10000;
-                // echo "Typ <b>niewiadomoco</b> to: ".gettype($niewiadomoco)."<br><br>";
-                // //echo "Typ <b>Kutno-Warszawa</b> to: ".gettype($niewiadomoco[0])."<br><br>";
-                   
-                // echo "<pre>";
-                // print_r($niewiadomoco);
-                // echo "</pre>";
-
-
-                    // foreach ($this->objOrder->lines as $key => $value)
-                    // {
-                    //     echo "Para:   $key => $value<br>";
-                    // }
-
-
-
-             //echo "Typ <b>Kutno-Warszawa</b> to: ".gettype($this->objOrder->lines)."<br><br>";
-                    
-
-            // var_dump($this->objOrder);
-
-            // echo "<br><br>:";
-            // echo "Czy obiekt jest pusty: ".(int) empty($this->objOrder);
-         
-
-            // $piesek = new stdClass();
-            // $piesek->iloscNog = 4;
-            // $piesek->ileGlow = 1;
-            // $piesek->imiona = array("Aleks", "Reksio", "Rad");
-            // $piesek->wlasciciel = "";
-
-            // if (isset($piesek->ustawione))
-            // {
-            //     echo "<br><br>USTAWIONE!!!<br><br>";
-            // }
-
-            // if (is_null($piesek->wlasciciel))
-            // {
-            //     echo "<br><br>Właściwość jest nuullem!!!<br><br>";
-            // }
-
-            // if (empty($piesek->wlasciciel))
-            // {
-            //     echo "<br><br>Właściwość pusta!!!<br><br>";
-            // }
-
-            // $reflect = new ReflectionObject($this->objOrder);
-
-            
-            // echo '<pre>'.print_r(get_class_methods($reflect), true).'</pre>';
-            
-            // $properties = $reflect->getProperties();
-
-            // echo "<pre>";
-            // print_r($properties);
-            // echo "</pre>";
-
-            // echo "Ilość pól: ".count($properties);
-
-
-
-
-
-                    // $KW = new stdClass();
-                    // $KW->name = "Kutno-Warszawa";
-                    // $KW->distance = 10;
-
-                    // $KL = new stdClass();
-                    // $KL->name = "Kutno-Lodz";
-                    // $KL->distance = 20;
-
-
-                    // $this->objOrder->kupa = [];
-                    // $this->objOrder->kupa[] = $KW;
-                    // $this->objOrder->kupa[] = $KL;
-
-                    // echo "<pre>".print_r($this->objOrder->kupa)."</pre>";                
+            // UWAGA! Ponieważ walidacja nie zatrzymała się do tej pory, oznacza to iż nie wystąpił żaden błąd walidacji.
+            // Można przygotować obiekt wyniku walidacji zwracający pozytywne wieści o uwalidacji i go zwrócić:
+            $objOrderValidationResult->success = true;
+            $objOrderValidationResult->errorCode = "EV999";
+            $objOrderValidationResult->message = "Walidacja zakończona powodzeniem.";
+            // Zwróć obiekt wyniku walidacji:
+            return $objOrderValidationResult;
         }
-
-
-
-
-
-
     }
 
 ?>
