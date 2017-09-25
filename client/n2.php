@@ -8,9 +8,9 @@
     $obj->numberOfCities = 3;
     $obj->cities = ["Kutno", "Warszawa", "Poznan"];
     $obj->lines = [
-        "Kutno-Warszawa" => 10,
-        "Kutno-Poznan" => 20,
-        "Warszawa-Poznan" => 30
+        "Kutno-Warszawa" => 130,
+        "Kutno-Poznan" => 180,
+        "Warszawa-Poznan" => 320
         //,"asd" => "kupa"
     ];
     $obj->initialCityName = "Kutno";

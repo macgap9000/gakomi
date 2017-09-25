@@ -4,15 +4,17 @@
         Gakomi Projekt - serwer
 
         API.php 
-        - główny plik "frontowy" aka kontroler do serwisu,
+        - główny plik "frontowy" aka kontroler do web serwisu,
         odpowiedzialny za realizację zgłoszonych żądań, zleceń obliczeń, itp.
-
     */
 
     // Podłączanie zalezności:
     
         // Walidator danych wejściowych:
         require_once __DIR__ . "/class/OrderValidator.php";
+
+        // Obliczeniowiec komiwojażera:
+        require_once __DIR__ . "/class/OrderComputer.php";
 
         // Kontroler bazy danych:
         //require_once __DIR__ . "/class/DatabaseController.php";
@@ -47,9 +49,24 @@
             // do obiektu, który zajmie się walidacją danych:
             $OrderValidator = new OrderValidator($objOrder);
             // Wykonanie walidacji danych wejściowych:
-            $result = $OrderValidator->validate();
+            $validationResult = $OrderValidator->validate();
+            // Jeśli walidacja zakończyła się powodzeniem to rozpocznij obliczenia,
+            // w przeciwnym razie zwróć numer błędu i komunikat użytkownikowi:
+            if ($validationResult->success == true)
+            {
+                // Przekazanie obiektu zamówienia (zawierającego dostarczone dane)
+                // do obiektu, który zajmie się obliczeniem problemu komiwojażera: 
+                // (compute - obliczać; computer - pracownik od obliczeń aka "obliczeniowiec")
+                $OrderComputer = new OrderComputer($objOrder);
+                // Uruchomienie procesu obliczeniowego:
+                $computingResult = $OrderComputer->compute();
+            }
+            else
+            {
+
+            }
             
-            echo "<pre>".var_dump($result)."</pre>";
+            echo "<pre>".var_dump($computingResult)."</pre>";
             
 
             break;
