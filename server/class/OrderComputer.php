@@ -69,11 +69,19 @@
                 for ($j = 0; $j <= $numberOfCities-1-1; $j++)
                 {
                     // Przepisz do zmiennej nazwę miasta A:
-                    echo $cityA_name = $permutationsArray["routes"][$i][$j];
-                    echo "-";
+                    $cityA_name = $permutationsArray["routes"][$i][$j];
                     // Przepisz do zmiennej nazwę miasta B:
-                    echo $cityB_name = $permutationsArray["routes"][$i][$j+1];
+                    $cityB_name = $permutationsArray["routes"][$i][$j+1];
+                    // Połącz (konkatenuj) nazwy miast:
+                    echo $cityABmatch = $cityA_name."-".$cityB_name;
                     echo "<br>";
+
+                    // Zwrtyfikuj czy takie miasto znajduje się na liście połączeń(lines):
+                    $cityABmatch_isInLines = in_array($cityABmatch, $lines)
+
+                    // Jeżeli miasto znajduje się na tej liście:
+
+                    // DO DOKOŃCZENIA!!!!!!!
                     
                 }
 
