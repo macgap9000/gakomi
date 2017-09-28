@@ -40,16 +40,21 @@
         // zlecić API wykonanie obliczeń problemu komiwojażera
         // (znalezienie najkrótszej możliwej trasy):
         case "POST":
+
             // Przepisanie do zmiennej zawartości POST (odebranych danych):
             $postBody = file_get_contents("php://input");
+
             // Ponieważ odebrane dane były zapisane w formacie JSON, należy
             // je teraz zdekodować i utworzyć na podstawie ich obiekt:
             $objOrder = json_decode($postBody);
+
             // Przekazanie obiektu zamówienia (zawierającego dostarczone dane)
             // do obiektu, który zajmie się walidacją danych:
             $OrderValidator = new OrderValidator($objOrder);
+
             // Wykonanie walidacji danych wejściowych:
             $validationResult = $OrderValidator->validate();
+            
             // Jeśli walidacja zakończyła się powodzeniem to rozpocznij obliczenia,
             // w przeciwnym razie zwróć numer błędu i komunikat użytkownikowi:
             if ($validationResult->success == true)
@@ -58,17 +63,38 @@
                 // do obiektu, który zajmie się obliczeniem problemu komiwojażera: 
                 // (compute - obliczać; computer - pracownik od obliczeń aka "obliczeniowiec")
                 $OrderComputer = new OrderComputer($objOrder);
+
                 // Uruchomienie procesu obliczeniowego:
-                $computingResult = $OrderComputer->compute();
+                $computationResult = $OrderComputer->compute();
             }
             else
             {
+                // Walidacja zakończyła się niepowodzeniem.
+                // Należy zwrócić informację o błędzie walidacji użytkownikowi:
+                
+                // Konwersja obiektu wyniku walidacji do formatu JSON:
+                $json = json_encode($validationResult, JSON_UNESCAPED_UNICODE);
 
+                // Ustawienie nagłówka HTTP i kodu błędu:
+                // (błąd nr 400 - Bad Request - nieprawidłowe zapytanie)
+                // (Zapytanie nie może zostać zrealizowane przez serwer 
+                // ponieważ nadesłane dane były nieprawidłowe
+                // w efekcie czego walidacja nie została zakończona prawidłowo.)
+                http_response_code(400);
+
+                // Ustawienie typu danych (JSON) i kodowania):
+                header("Content-Type: application/json; charset=utf-8");
+
+                // Wydrukowanie odpowiedzi:
+                echo $json;
+
+                // Zakończ działanie skryptu:
+                break;
             }
             
             echo "<pre>".var_dump($computingResult)."</pre>";
             
-
+            // Zakończenie działania tego przełącznika (bezpiecznik):
             break;
 
         // Wybrano metodę HTTP typu GET. Użytkownik więc chciałby
