@@ -17,7 +17,7 @@
         require_once __DIR__ . "/class/OrderComputer.php";
 
         // Kontroler bazy danych:
-        //require_once __DIR__ . "/class/DatabaseController.php";
+        require_once __DIR__ . "/class/DatabaseController.php";
 
         // Generator tokenów:
         //require_once __DIR__ . "/class/TokenGenerator.php";
@@ -66,6 +66,76 @@
 
                 // Uruchomienie procesu obliczeniowego:
                 $computationResult = $OrderComputer->compute();
+
+                // Jeśli obliczenia zakończyły się powodzeniem to rozpocznij
+                // zapis wytworzonych danych do bazy danych (zamówienia i wyników obliczeń):
+                if ($computationResult->success == true)
+                {
+                    // Utworzenie obiektu kontrolera bazy danych:
+                    $DatabaseController = new DatabaseController();
+
+                    // Inicjalizuj połączenie do bazy:
+                    $initConnectionResult = $DatabaseController->initConnection();
+
+                    // Jeśli połączenie zostało nawiązane pomyślnie to zleć dodanie danych do bazy:
+                    if ($initConnectionResult->success == true)
+                    {
+                        // Przepisanie obiektu wyniku obliczeń:
+                        $objComputationResult = $computationResult->objResult;
+
+                        // Przekazanie obiektu zamówienia (zawierającego dostarczone dane)
+                        // oraz obiektu wyniku obliczeń do zapisania ich w bazie danych:
+                        $savingToDatabaseResult = $DatabaseController->saveToDatabase($objOrder, $objComputationResult);
+
+
+                    }
+                    else
+                    {
+                        // Niepowodzenie w nawiązywaniu połączenia z bazą danych.
+                        // Należy zwrócić informację o błędzie połączenia użytkownikowi:
+                        $json = json_encode($initConnectionResult, JSON_UNESCAPED_UNICODE);
+
+                        // Ustawienie nagłówka HTTP i kodu błędu:
+                        // (błąd nr 500 - Internal Server Error - wewnętrzny błąd serwera)
+                        // (Serwer napotkał niespodziewane trudności, które uniemożliwiły
+                        // zrealizowanie żądania. Jest to problem w łączności z bazą danych.)
+                        http_response_code(500);
+
+                        // Ustawienie typu danych (JSON) i kodowania):
+                        header("Content-Type: application/json; charset=utf-8");
+
+                        // Wydrukowanie odpowiedzi:
+                        echo $json;
+
+                        // Zakończ działanie skryptu:
+                        break;
+                    }
+                }
+                else
+                {
+                    // Obliczenia zakończyły się niepowodzeniem.
+                    // Należy zwrócić informację o błędzie obliczeń użytkownikowi:
+                    
+                    // Konwersja obiektu wyniku obliczeń do formatu JSON:
+                    $json = json_encode($computationResult, JSON_UNESCAPED_UNICODE);
+
+                    // Ustawienie nagłówka HTTP i kodu błędu:
+                    // (błąd nr 500 - Internal Server Error - wewnętrzny błąd serwera)
+                    // (Serwer napotkał niespodziewane trudności, które uniemożliwiły
+                    // zrealizowanie żądania. Najprawdopodobniej zawiodła walidacja,
+                    // ktoś próbował przypuścić atak na system Gakomi, albo wystąpił
+                    // problem z integralnością przesłanych danych.)
+                    http_response_code(500);
+
+                    // Ustawienie typu danych (JSON) i kodowania):
+                    header("Content-Type: application/json; charset=utf-8");
+
+                    // Wydrukowanie odpowiedzi:
+                    echo $json;
+
+                    // Zakończ działanie skryptu:
+                    break;
+                }
             }
             else
             {
@@ -92,10 +162,103 @@
                 break;
             }
             
-            echo "<pre>".var_dump($computingResult)."</pre>";
+          echo "<pre>".var_dump($savingToDatabaseResult)."</pre>";
             
             // Zakończenie działania tego przełącznika (bezpiecznik):
             break;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
         // Wybrano metodę HTTP typu GET. Użytkownik więc chciałby
         // uzyskać od API wyniki swoich obliczeń na postawie dostarczonego tokena:

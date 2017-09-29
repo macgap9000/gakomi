@@ -1,9 +1,11 @@
 # gakomi
 The project of TSP made by Macgap.
 
-Used projects:
+Used projects and solutions:
 * server-side:
     1. random_compat 2.0.10 (MIT) - https://github.com/paragonie/random_compat
+    2. pc_permute (O'Reilly) - https://docstore.mik.ua/orelly/webprog/pcook/ch04_26.htm
+    modified by dAngelov, user of stackoverflow - https://stackoverflow.com/a/13194803
 * client-side:
     1. bootstrap 3.3.7 (MIT) - https://github.com/twbs/bootstrap
     2. jquery 1.12.4 (MIT) - https://github.com/jquery/jquery

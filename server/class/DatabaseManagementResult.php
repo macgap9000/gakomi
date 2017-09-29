@@ -1,16 +1,16 @@
 <?php
 
-    // Definicja obiektu zawierającego wynik walidacji
-    // przez obiekt klasy OrderValidator.
+    // Definicja obiektu zawierającego wynik operacji zarządzania na bazie danych
+    // przez obiekt klasy DatabaseController.
 
     // Definicja klasy:
-    class OrderValidationResult
+    class DatabaseManagementResult 
     {
         // Definicja pól klasy:
         
-            // Definicja statusu (sukcesu) walidacji:
-            // true - walidacja udana
-            // false - walidacja nieudana
+            // Definicja statusu (sukcesu) operacji na bazie:
+            // true - operacja na bazie udana
+            // false - operacja na bazie nieudana
             public $success;
 
             // Definicja kodu błędu:

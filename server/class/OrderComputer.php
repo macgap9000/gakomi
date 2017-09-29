@@ -17,7 +17,7 @@
         }
 
         // Zdumpowanie danych (obiektu obliczeniowego) w celach debuggowania:
-        public function debugValidator()
+        public function debugComputer()
         {
             var_dump($this);
         }
@@ -31,6 +31,27 @@
         // Wykonanie obliczeń dla komiwojażera:
         public function compute()
         {
+            // Podłączenie pliku klasy obiektu wyniku obliczeń:
+            require_once __DIR__ . '/OrderComputationResult.php"';
+            // Powołanie obiektu wyniku obliczeń:
+            $objOrderComputationResult = new OrderComputationResult();
+
+            // Sprawdzenie czy przekazane dane do pola "objOrder"
+            // faktycznie stanowią obiekt. Jeśli nie, to nie można go dalej przetwarzać:
+            // Pobranie typu, jakiego jest wskazane pole "objOrder":
+            $objOrder_isObject = is_object($this->objOrder);
+            // Jeśli dane pole nie jest obiektem:
+            if ($objOrder_isObject == false)
+            {
+                // Zwróć stosowny wynik obliczeń (błąd obliczeń - pole obiektu zamówienia nie jest obiektem):
+                $objOrderComputationResult->success = false;
+                $objOrderComputationResult->errorCode = "EC000";
+                $objOrderComputationResult->message = "Problem z integralnością obiektu zamówienia podczas wykonywania obliczeń.";
+                // Zwróć obiekt wyniku obliczeń:
+                return $objOrderComputationResult;
+            }
+
+            
             // Przepisanie do zmiennej roboczej ilości miast:
             $numberOfCities = (int) $this->objOrder->numberOfCities;
             // Przepisanie do tablicy roboczej listy miast:
@@ -44,20 +65,12 @@
             $permutationsArray["routes"] = $this->pc_permute($cities);
 
             // Określ liczbę odnalezionych permutacji (możliwych tras):
-            echo "Liczba tras: ".$numberOfRoutes = count($permutationsArray["routes"]);
+            $numberOfRoutes = count($permutationsArray["routes"]);
 
             // Przygotuj pustą tablicę na wyliczone kilometraże (całowite długości tras):
             $permutationsArray["mileages"] = "";
 
             
-            echo "<br><br>";
-
-            echo "<pre>";
-            print_r($lines);
-            echo "</pre>";
-
-
-
             // Przelicz metodą siłową odległości dla każdej z permutacji (możliwej trasy):
             // UWAGA! Ponieważ numerowanie indeksów jest tu od zera, należy od ilości
             // wszystkich permutacji (tras) odjąć jeden:
@@ -81,8 +94,7 @@
                     // Przepisz do zmiennej nazwę miasta B (np. "Warszawa"):
                     $cityB_name = $permutationsArray["routes"][$i][$j+1];
                     // Połącz (konkatenuj) nazwy miast (np. "Kutno-Warszawa"):
-                    echo $cityABmatch = $cityA_name."-".$cityB_name;
-                    echo "<br>";
+                    $cityABmatch = $cityA_name."-".$cityB_name;
 
                     // Zweryfikuj czy takie miasto znajduje się na liście połączeń (lines):
                     $cityABmatch_isInLines = array_key_exists($cityABmatch, $lines);
@@ -110,19 +122,23 @@
                         }
                         else
                         {
-                            // Błąd krytyczny!
+                            // Błąd krytyczny! Nie odnaleziono linii (połączeń) między miastami
+                            // koniecznych do przeprowadzenia obliczeń. Mogła zawieść walidacja
+                            // lub ktoś przypuścił atak na system Gakomi.
+
+                            // Zwróć stosowny wynik obliczeń (informację o błędzie krytycznym) użytkownikowi:
+                            $objOrderComputationResult->success = false;
+                            $objOrderComputationResult->errorCode = "EC001";
+                            $objOrderComputationResult->message = "Wystąpił błąd krytyczny podczas wykonywania obliczeń. Przepraszamy.";
+                            // Zwróć obiekt wyniku obliczeń:
+                            return $objOrderComputationResult;
                         }
                     }
                 }
 
                 // Przepisz do tablicy $mileages uzyskaną kilometrażówkę dla danej trasy całkowitej:
                 // ($i - to indeks aktualnie przetwarzanej trasy, celem zachowania spójności danych)
-                $permutationsArray["mileages"][$i] = $mileage;
-
-                echo 'Długość kilometrażówki: $mileage = '.$mileage.'<br>';
-                echo "----------<br>";
-                echo "<br>";
-                
+                $permutationsArray["mileages"][$i] = $mileage;              
             }
 
 
@@ -134,13 +150,6 @@
             $theShortestRoute["route"] = "";
             // Przygotowanie pola w tablicy na kilometrażówkę wybranej permutacji:
             $theShortestRoute["mileage"] = "";
-
-
-            // $aaaaa = empty($theShortestRoute["route"]);
-            // if ($aaaaa == true)
-            // {
-            //     echo "PUSTEEEEEEEEEEEEEEEEEEE!<br>";
-            // }
             
 
             // Poszukiwanie najkrótszej trasy dla komiwojażera z miasta startowego:
@@ -172,39 +181,47 @@
                             $theShortestRoute["mileage"] = $permutationsArray["mileages"][$i];
                         }
                     }
-
-
                 }
-
             }
 
 
+            // Obliczenia zostały zakończone. Należy teraz przekształcić tablicę na obiekt:
+            $objResult = (object) $theShortestRoute;
 
+            // Zwróć stosowny wynik obliczeń:
+            $objOrderComputationResult->success = true;
+            $objOrderComputationResult->errorCode = "EC999";
+            $objOrderComputationResult->message = "Obliczenia zakończone powodzeniem.";
 
-            // foreach($permutationsArray["routes"] as $route)
-            // {
-            //     echo "<br>".var_dump($route)."<br>";
-            // }
+            // Dołącz zwracanego obiektu wytworzony przed momentem obiekt obliczeń:
+            $objOrderComputationResult->objResult = $objResult;
 
+            // Zwróć obiekt wyniku obliczeń:
+            return $objOrderComputationResult;
 
-
-
-
-
-            // Odległość dla pierwszej permutacji:
-            
-            echo "<pre>";
-            print_r($permutationsArray);
-            echo "</pre>";
-
-
-
-            echo "<pre>";
-            print_r($theShortestRoute);
-            echo "</pre>";
+            // ---------------------------------------------
+            // Debuggowanie:
+            // ---------------------------------------------
+            // Tablica permutacji:
+            // echo "<pre>";
+            // print_r($permutationsArray);
+            // echo "</pre>";
+            // ---------------------------------------------
+            // Tablica najkrótszej trasy dla komiwojażera:
+            // echo "<pre>";
+            // print_r($theShortestRoute);
+            // echo "</pre>";
+            // ---------------------------------------------
+            // Obiekt wyniku obliczeń:
+            // echo "<pre>";
+            // print_r($objOrderComputationResult);
+            // echo "</pre>";
+            // ---------------------------------------------
         }
 
         // Funkcja wykonująca permutację zbioru:
+        // Źródło: PHP Cookbook by O'REILLY
+        // Modyfikacja: dAngelov / https://stackoverflow.com/a/13194803
         private function pc_permute($items, $perms = array( )) {
             if (empty($items)) {
                 $return = array($perms);

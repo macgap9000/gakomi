@@ -5,7 +5,7 @@
 
     $obj = new stdClass();
 
-    $obj->numberOfCities = "ffff";
+    $obj->numberOfCities = 3;
     $obj->cities = ["Kutno", "Warszawa", "Poznan"];
     $obj->lines = [
         "Kutno-Warszawa" => 130,
