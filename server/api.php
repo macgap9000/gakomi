@@ -19,10 +19,6 @@
         // Kontroler bazy danych:
         require_once __DIR__ . "/class/DatabaseController.php";
 
-        // Generator tokenów:
-        //require_once __DIR__ . "/class/TokenGenerator.php";
-
-
     // Ustawienie stałej wersji protokołu HTTP:
     define("HTTP_VERSION", "HTTP/1.1");
 
@@ -87,7 +83,54 @@
                         // oraz obiektu wyniku obliczeń do zapisania ich w bazie danych:
                         $savingToDatabaseResult = $DatabaseController->saveToDatabase($objOrder, $objComputationResult);
 
+                        // Sprawdzenie czy zapis do bazy się udał:
+                        if ($savingToDatabaseResult->success == true)
+                        {
+                            // Powodzenie w zapisie danych do bazy. Token przygotowany.
+                            // Należy zwrócić informację o zakończeniu prac użytkownikowi:
+                            
+                                // Konwersja obiektu do formatu JSON:
+                                $json = json_encode($savingToDatabaseResult, JSON_UNESCAPED_UNICODE);
 
+                                // Ustawienie nagłówka HTTP i kodu błędu:  
+                                // (bład nr 201 - Created - utworzono)
+                                // (treść zamówienia jak i wyniki jego zostały zapisane na serwerze
+                                // a klientowi zaraz zostanie zwrócona informacja o tym i token):
+                                http_response_code(201);
+
+                                // Ustawienie typu danych (JSON) i kodowania):
+                                header("Content-Type: application/json; charset=utf-8");
+
+                                // Wydrukowanie odpowiedzi (m.in. nagłówek HTTP, kod błędu Gakomi, token):
+                                echo $json;
+
+                            // To koniec działania! :)
+                        }
+                        else
+                        {
+                            // Niepowodzenie w zapisie do bazy danych. Brak więc tokena.
+                            // Należy zwrócić informację o zakończeniu prac użytkownikowi:
+
+                                // Konwersja obiektu do formatu JSON:
+                                $json = json_encode($savingToDatabaseResult, JSON_UNESCAPED_UNICODE);
+
+                                // Ustawienie nagłówka HTTP i kodu błędu:
+                                // (błąd nr 500 - Internal Server Error - wewnętrzny błąd serwera)
+                                // (Serwer napotkał niespodziewane trudności, które uniemożliwiły
+                                // zrealizowanie żądania. Jest to problem z zapisem danych do bazy danych
+                                // lub problem z wygenerowaniem tokena,)
+                                http_response_code(500);
+
+                                // Ustawienie typu danych (JSON) i kodowania):
+                                header("Content-Type: application/json; charset=utf-8");
+
+                                // Wydrukowanie odpowiedzi (m.in. nagłówek HTTP, kod błędu Gakomi, token):
+                                echo $json;                                
+
+                            // To koniec działania! :(
+                            // Użytkownik może przesłać jeszcze raz dane by ponowić próbę
+                            // przetwarzania danych jego zamówienia. 
+                        }
                     }
                     else
                     {
@@ -161,103 +204,8 @@
                 // Zakończ działanie skryptu:
                 break;
             }
-            
-          echo "<pre>".var_dump($savingToDatabaseResult)."</pre>";
-            
             // Zakończenie działania tego przełącznika (bezpiecznik):
             break;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
         // Wybrano metodę HTTP typu GET. Użytkownik więc chciałby
@@ -269,6 +217,8 @@
             header("Content-Type: application/json; charset=utf-8");
             $json = json_encode($_GET);
             echo $json;
+
+                    //  echo "<pre>".var_dump($savingToDatabaseResult)."</pre>";
             */
             break;
 
