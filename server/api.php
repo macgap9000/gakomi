@@ -211,7 +211,20 @@
         // Wybrano metodę HTTP typu GET. Użytkownik więc chciałby
         // uzyskać od API wyniki swoich obliczeń na postawie dostarczonego tokena:
         case "GET":
-            //echo "GET!";
+
+                        // Przepisanie do zmiennej zawartości POST (odebranych danych):
+                        $postBody = file_get_contents("php://input");
+                        
+                                    // Ponieważ odebrane dane były zapisane w formacie JSON, należy
+                                    // je teraz zdekodować i utworzyć na podstawie ich obiekt:
+                                    $objOrder = json_decode($postBody);
+
+                                    var_dump($objOrder);
+
+            echo "<pre>";
+            print_r($_GET);
+            echo "</pre>";
+            echo "GET!";
             /*
             http_response_code(200);
             header("Content-Type: application/json; charset=utf-8");
