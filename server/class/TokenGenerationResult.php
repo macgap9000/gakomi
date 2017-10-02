@@ -1,6 +1,6 @@
 <?php
 
-    // Definicja obiektu zawierającego wynik operacji renerowania tokenu
+    // Definicja obiektu zawierającego wynik operacji generowania tokenu
     // przez obiekt klasy TokenGenerator.
 
     // Definicja klasy:

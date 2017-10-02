@@ -45,6 +45,12 @@
             var_dump($this->objComputationResult);
         }
 
+        // Zdumpowanie danych (tokena) w celach debuggowania:
+        public function debugReceivedToken()
+        {
+            var_dump($this->token);
+        }
+
         // Metoda inicjalizacji połączenia z bazą danych:
         public function initConnection()
         {
@@ -146,8 +152,8 @@
                 }
 
 
-            // Jeśli flaga poprawności została podniesiona do góry,
-            // można spróbować dodać dane do bazy danych:
+            // Jeśli flaga poprawności nawiązania połączenia do bazy została 
+            // podniesiona do góry, można spróbować dodać dane do bazy danych:
             if ($this->isConnected == true)
             {
                 // Przygotowanie tokena dla przetwarzanego zamówienia:
@@ -182,7 +188,7 @@
                     $lines = (array) $this->objOrder->lines;
                     // Przepisanie do zmiennej roboczej nazwy miasta startowego:
                     $initialCityName = (string) $this->objOrder->initialCityName;
-                    // Przepisanie do zmiennej roboczej wyniku (najkrótszej trasy)
+                    // Przepisanie do tablicy roboczej wyniku (najkrótszej trasy)
                     $route = (array) $this->objComputationResult->route;
                     // Przepisanie do zmiennej roboczej wyniku (długości trasy):
                     $mileage = (double) $this->objComputationResult->mileage;
@@ -357,6 +363,8 @@
 
                         // Zwróć obiekt wyniku transakcji:
                         return $objDatabaseManagementResult;
+
+                        // Koniec działań kontrolera! :)
                     }
                 }
                 catch (PDOException $ex)
@@ -378,8 +386,8 @@
             }
             else
             {
-                // Jeśli uruchamia się ta część kodu, oznacza to flaga jest opuszczona i ktoś
-                // próbował uruchomić procedurę dodawania danych do bazy danych
+                // Jeśli uruchamia się ta część kodu, oznacza to, że flaga jest opuszczona 
+                // i ktoś próbował uruchomić procedurę dodawania danych do bazy danych
                 // bez ówcześniejczego sprawdzenia czy połączenie zostało nawiązane.
                 // Widać to poprzez to, że flaga była podniesiona do góry.
                 // Należy zwrócić odpowiedni komunikat użytkownikowi.
@@ -394,13 +402,365 @@
             }
         }
 
-        // Przykładowe listowanie danych:
-        public function getAllTokens()
+        // Metoda odczytująca dane (zamówienie i wynik obliczeń) z bazy danych:
+        public function readFromDatabase($token)
         {
-            $statement = $this->pdo->query("SELECT * FROM orders");
-            $result = $statement->fetchAll(PDO::FETCH_ASSOC);
-            return $result;
-        } 
+            // Podłączenie konfiguracji bazy danych:
+            require __DIR__ . '../../settings/config.php';
+
+            // Podłączenie pliku klasy obiektu wyniku zarządzania na bazie danych:
+            require_once __DIR__ . '/DatabaseManagementResult.php';
+            // Powołanie obiektu wyniku zarządzania danymi na bazie danych:
+            $objDatabaseManagementResult = new DatabaseManagementResult();
+
+            // Przepisanie odebranego tokena
+            // do pola prywatnego kontrolera bazy danych:
+            $this->token = $token;
+            
+            // Sprawdzenie integralności stringa nie jest wymagane,
+            // bo ten już został ówcześniej sprawdzony przez walidatora tokenów.
+
+            // Jeśli flaga poprawności nawiązania połączenia do bazy została
+            // podniesiona do góry, to można spróbować odczytać dane z bazy:
+            if ($this->isConnected == true)
+            {
+                // Przepisanie do zmiennej roboczej przygotowanego tokena:
+                $token = (string) $this->token;
+
+                // Przygotowanie zmiennych roboczych do przechowywania odebranych danych z bazy:
+
+                    // Tablica robocza dla całego zamówienia:
+                    $orders = null;
+                    // Tablica robocza dla listy miast:
+                    $cities = null;
+                    // Tablica robocza dla listy połączeń (linii) między miastami:
+                    $lines = null;  
+                    // Tablica robocza dla najkrótszej trasy dla komiwojażera:
+                    $resultroute = null;
+                    // Zmienna robocza dla odległości trasy dla komiwojażera:
+                    $resultmileage = null;
+
+                // Wykonaj próbę odczytu danych z bazy danych:
+                try
+                {
+                    // Rozpoczęcie transakcji:
+                    $this->pdo->beginTransaction();
+
+                    // KROK 1. Odczytanie z tabeli [orders] wpisu o zamówieniu:
+
+                        // Przygotowanie treści SELECT SQL:
+                        $statement = $this->pdo->prepare("SELECT *
+                                                          FROM $db_name.orders
+                                                          WHERE (token = :token);
+                                                         ");
+
+                        // Bindowanie parametrów:
+                        // (tym samym zabezpieczenie przed SQL Injection):
+                        $statement->bindParam(":token", $token);
+
+                        // Wykonanie zapytania:
+                        $statement->execute();
+
+                        // Przepisanie wyniku zapytania do tablicy:
+                        $orders = $statement->fetchAll(PDO::FETCH_ASSOC);
+
+                        // Oczyszczenie obiektu zapytania:
+                        $statement = null;
+
+                    // Dalsze kroki mają sens wtedy, gdy istnieje jakiekolwiek zamówienie.
+                    // Ilość wierszy, które znalazły się w wyniku zapytania musi być większa od zera.
+
+                    // Oblicz ilość wierszy:
+                    $orders_numberOfRows = count($orders);
+
+                    // Kontynuuj działania, jeśli ilość wierszy jest większa od zera
+                    // (jeśli odnaleziono zamówienie w bazie danych):
+                    if ($orders_numberOfRows > 0)
+                    {
+                        // Przepisanie do zmiennej identyfikatora zamówienia:
+                        $orderID = $orders[0]['orderID'];                        
+
+                        // KROK 2. Odczytanie z tabeli [cities] listy miast zamówienia:
+
+                            // Przygotowanie treści SELECT SQL:
+                            $statement = $this->pdo->query("SELECT cityName
+                                                            FROM $db_name.cities
+                                                            WHERE (orderID = $orderID);
+                                                           ");
+
+                            // Bindowanie niepotrzebne. Brak niebezpiecznych parametrów.
+
+                            // Wykonanie zapytania:
+                            $statement->execute();
+
+                            // Przepisanie wyniku zapytania do tablicy:
+                            $cities = $statement->fetchAll(PDO::FETCH_ASSOC);
+
+                            // Oczyszczenie obiektu zapytania:
+                            $statement = null;
+
+                        // KROK 3. Odczytanie z tabeli [lines] listy linii (połączeń) zamówienia:
+
+                            // Przygotowanie treści SELECT SQL:
+                            $statement = $this->pdo->query("SELECT lineName, distanceValue
+                                                            FROM $db_name.lines
+                                                            WHERE (orderID = $orderID);
+                                                           ");
+
+                            // Bindowanie niepotrzebne. Brak niebezpiecznych parametrów.
+
+                            // Wykonanie zapytania:
+                            $statement->execute();
+
+                            // Przepisanie wyniku zapytania do tablicy:
+                            $lines = $statement->fetchAll(PDO::FETCH_ASSOC);
+
+                            // Oczyszczenie obiektu zapytania:
+                            $statement = null;                            
+
+                        // KROK 4. Odczytanie z tabeli [resultroute] listy miast trasy wynikowej:
+
+                            // Przygotowanie treści SELECT SQL:
+                            $statement = $this->pdo->query("SELECT cityName
+                                                            FROM $db_name.resultroute
+                                                            WHERE (orderID = $orderID);
+                                                           ");
+
+                            // Bindowanie niepotrzebne. Brak niebezpiecznych parametrów.
+
+                            // Wykonanie zapytania:
+                            $statement->execute();
+
+                            // Przepisanie wyniku zapytania do tablicy:
+                            $resultroute = $statement->fetchAll(PDO::FETCH_ASSOC);
+
+                            // Oczyszczenie obiektu zapytania:
+                            $statement = null;
+
+                        // KROK 5. Odczytanie z tabeli [resultmileage] długości trasy wynikowej:
+
+                            // Przygotowanie treści SELECT SQL:
+                            $statement = $this->pdo->query("SELECT mileageValue
+                                                            FROM $db_name.resultmileage
+                                                            WHERE (orderID = $orderID);
+                                                           ");
+
+                            // Bindowanie niepotrzebne. Brak niebezpiecznych parametrów.
+
+                            // Wykonanie zapytania:
+                            $statement->execute();
+
+                            // Przepisanie wyniku zapytania do tablicy:
+                            $resultmileage = $statement->fetchAll(PDO::FETCH_ASSOC);
+
+                            // Oczyszczenie obiektu zapytania:
+                            $statement = null;                        
+                    }                  
+
+                    // Finalizacja! Wykonaj transakcję.
+                    // Status transakcji zostanie zapisany do zmiennej:
+                    $commitStatus = $this->pdo->commit();
+                }
+                catch (PDOException $ex)
+                {
+                    // Poniewaz ta transakcja tylko odczytywała dane z bazy,
+                    // a niczego w niej nie zmieniała, nie ma więc żadnych zmian do wycofania.
+                    
+                    // Transakcja nie powiodła się. Problem z odczytem z bazy.
+                    // Przygotuj informację o błędzie:
+                    $objDatabaseManagementResult->success = false;
+                    $objDatabaseManagementResult->errorCode = "ED998";
+                    $objDatabaseManagementResult->message = "Wystąpił błąd podczas odczytu z bazy danych.";
+                    // Jeśli chcesz dołączyć wiadomość z treścią przechwyconego wyjątku, wykorzystaj poniższą składnię:
+                    // echo 'Wystąpił błąd: ' . $ex->getMessage();
+
+                    // Zwróć obiekt wyniku transakcji:
+                    return $objDatabaseManagementResult;
+                }
+
+
+                // Sprawdzenie stanu transakcji. Kontynuuj jeśli zakończyła się powodzeniem:
+                if ($commitStatus == true)
+                {
+                    // Transakcja zakończyła się. Jeśli zlecenie zostało odnalezione na podstawie
+                    // dostarczonego tokenu, to zostały pobrane wszystkie informacje o zleceniu
+                    // (co szczególnie ważne) w jednej transakcji.
+                    
+                    // Dalsze postępowanie w zależności od tego czy zostało odnalezione zlecenie:
+                    if ($orders_numberOfRows > 0)
+                    {
+                        // Teraz należy sprawdzić integralność danych, pobranych z bazy danych.
+                        // Trzeba sprawdzić czy w ogóle pobrano dane z pozostałych tabel:
+                        
+                            // Sprawdzenie danych pozyskanych z tabeli bazodanowej miast (tabela 'cities'):
+
+                                // Pobranie ilości wpisów w tablicy:
+                                $cities_numberOfRows = count($cities);
+
+                                // Jeśli nie odnaleziono wpisów (ilość mniejsza od 1) to zwróć błąd:
+                                if (!($cities_numberOfRows > 0))
+                                {
+                                    // Brak pobranych danych z tabeli bazodanowej miast (tabela 'cities').
+                                    // Przygotuj informację o błędzie:
+                                    $objDatabaseManagementResult->success = false;
+                                    $objDatabaseManagementResult->errorCode = "ED901";
+                                    $objDatabaseManagementResult->message = "Problem z integralnością danych. Nie odnaleziono danych w tabeli miast.";
+                                    // Zwróć obiekt wyniku odczytu z bazy:
+                                    return $objDatabaseManagementResult;
+                                }
+
+                            // Sprawdzenie danych pozyskanych z tabeli bazodanowej linii (połączeń między miastami) (tabela 'lines'):
+
+                                // Pobranie ilości wpisów w tablicy:
+                                $lines_numberOfRows = count($lines);
+
+                                // Jeśli nie odnaleziono wpisów (ilość mniejsza od 1) to zwróć błąd:
+                                if (!($lines_numberOfRows > 0))
+                                {
+                                    // Brak pobranych danych z tabeli bazodanowej linii (połączeń między miastmai) (tabela 'lines').
+                                    // Przygotuj informację o błędzie:
+                                    $objDatabaseManagementResult->success = false;
+                                    $objDatabaseManagementResult->errorCode = "ED902";
+                                    $objDatabaseManagementResult->message = "Problem z integralnością danych. Nie odnaleziono danych w tabeli linii (połączeń między miastami).";
+                                    // Zwróć obiekt wyniku odczytu z bazy:
+                                    return $objDatabaseManagementResult;
+                                }
+
+                            // Sprawdzenie danych pozyskanych z tabeli bazodanowej trasy wynikowej (tabela 'resultroute'):
+
+                                // Pobranie ilości wpisów w tablicy:
+                                $resultroute_numberOfRows = count($resultroute);
+
+                                // Jeśli nie odnaleziono wpisów (ilość mniejsza od 1) to zwróć błąd:
+                                if (!($resultroute_numberOfRows > 0))
+                                {
+                                    // Brak pobranych danych z tabeli bazodanowej trasy wynikowej (tabela 'resultroute').
+                                    // Przygotuj informację o błędzie:
+                                    $objDatabaseManagementResult->success = false;
+                                    $objDatabaseManagementResult->errorCode = "ED903";
+                                    $objDatabaseManagementResult->message = "Problem z integralnością danych. Nie odnaleziono danych w tabeli trasy wynikowej.";
+                                    // Zwróć obiekt wyniku odczytu z bazy:
+                                    return $objDatabaseManagementResult;
+                                }
+
+                            // Sprawdzenie danych pozyskanych z tabeli bazodanowej długości trasy wynikowej (tabela 'resultmileage'):
+                            
+                                // Pobranie ilości wpisów w tablicy:
+                                $resultmileage_numberOfRows = count($resultmileage);
+                                
+                                // Jeśli nie odnaleziono wpisów (ilość mniejsza od 1) to zwróć błąd:
+                                if (!($resultmileage_numberOfRows > 0))
+                                {
+                                    // Brak pobranych danych z tabeli bazodanowej długości trasy wynikowej (tabela 'resultmileage').
+                                    // Przygotuj informację o błędzie:
+                                    $objDatabaseManagementResult->success = false;
+                                    $objDatabaseManagementResult->errorCode = "ED904";
+                                    $objDatabaseManagementResult->message = "Problem z integralnością danych. Nie odnaleziono danych w tabeli długości trasy wynikowej.";
+                                    // Zwróć obiekt wyniku odczytu z bazy:
+                                    return $objDatabaseManagementResult;
+                                }
+                                
+                        // Żądane dane odnalezione zlecenie w bazie danych. 
+                        // Integralność danych potwierdzona.
+                        // Pora opakować odebrane dane w obiekt typu "paczka" (bundle):
+
+                        // Podłączenie pliku klasy obiektu paczki:
+                        require_once __DIR__ . '/Bundle.php';
+                        // Powołanie obiektu paczki:
+                        $Bundle = new Bundle();
+
+                        // Uzupełnianie obiektu pobranymi danymi:
+
+                            // Wpisanie do obiektu zdefiniowanej ilości miast (numberOfCities):
+                            $Bundle->numberOfCities = $orders[0]['numberOfCities'];
+                        
+                            // Wpisanie do obiektu listy miast:
+                            foreach ($cities as $city)
+                            {
+                                // Dodaj kolejne miasto do listy:
+                                $Bundle->cities[] = $city['cityName'];
+                            }
+
+                            // Wpisanie do obiektu listy linii (połączeń między miastami):
+                            foreach ($lines as $line)
+                            {
+                                // Pobranie nazwy miasta:
+                                $cityName = $line['lineName'];
+                                // Pobranie długości linii:
+                                $distanceValue = $line['distanceValue'];
+
+                                // Dodaj kolejną linię do listy:
+                                $Bundle->lines[$cityName] = $distanceValue;
+                            }
+
+                            // Wpisanie do obiektu nazwy miasta startowego:
+                            $Bundle->initialCityName = $orders[0]['initialCityName'];
+
+                            // Wpisanie do obiektu miast trasy dla komiwojażera:
+                            foreach ($resultroute as $city)
+                            {
+                                // Dodaj kolejne miasto do listy:
+                                $Bundle->route[] = $city['cityName'];
+                            }
+
+                            // Wpisanie do obiektu długości trasy dla komiwojażera:
+                            $Bundle->mileage = $resultmileage[0]['mileageValue'];
+                        
+
+                        // Zwrócenie użytkownikowi informacji o sukcesie i wyników odczytu z bazy:
+                        // Przygotowanie informacji:
+                        $objDatabaseManagementResult->success = true;
+                        $objDatabaseManagementResult->errorCode = "ED999";
+                        $objDatabaseManagementResult->message = "Dane zostały pomyślnie odczytane z bazy danych.";
+                        // Dołącz obiekt paczki:
+                        $objDatabaseManagementResult->bundle = $Bundle;
+
+                        // Zwróć obiekt użytkownikowi:
+                        return $objDatabaseManagementResult;
+
+                        // Koniec działań kontrolera! :)
+                    }
+                    else
+                    {
+                        // Zlecenie nie zostalo odnalezione w bazie danych.
+                        // Przygotuj informację o tym fakcie dla użytkownika:
+                        $objDatabaseManagementResult->success = false;
+                        $objDatabaseManagementResult->errorCode = "ED900";
+                        $objDatabaseManagementResult->message = "Wybrany token nie został odnaleziony w bazie danych.";
+
+                        // Zwróć obiekt wyniku transakcji:
+                        return $objDatabaseManagementResult;
+                    }
+                }
+                else
+                {
+                    // Transakcja nie powiodła się. Problem z odczytem z bazy.
+                    // Przygotuj informację o błędzie:
+                    $objDatabaseManagementResult->success = false;
+                    $objDatabaseManagementResult->errorCode = "ED998";
+                    $objDatabaseManagementResult->message = "Wystąpił błąd podczas odczytu z bazy danych.";
+
+                    // Zwróć obiekt wyniku transakcji:
+                    return $objDatabaseManagementResult;                    
+                }
+            }
+            else
+            {
+                // Jeśli uruchamia się ta część kodu, oznacza to, że flaga jest opuszczona
+                // i ktoś próbował uruchomić procedurę odczytu danych z bazy danych
+                // bez ówcześniejszego sprawdzenia czy połączenie zostało nawiązane.
+                // Widać to poprzez to, że flaga była podniesiona do góry.
+                // Należy zwrócić odpowiedni komunikat użytkownikowi.
+
+                // Wypełnij informację o problemie w połączeniu z bazą danych:
+                $objDatabaseManagementResult->success = false;
+                $objDatabaseManagementResult->errorCode = "ED004";
+                $objDatabaseManagementResult->message = "Nie zostało przetestowane połączenie z bazą danych. Należy je przetestować przed próbą dostępu do bazy.";
+
+                // Zwróć stosowną informację o stanie łączności z bazą danych:
+                return $objDatabaseManagementResult;
+            }
+        }
     }
 
 ?>

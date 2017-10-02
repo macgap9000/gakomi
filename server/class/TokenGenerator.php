@@ -34,7 +34,7 @@
                 // Generowanie tokena zakończone powodzeniem.
                 // Wypełnij obiekt wyniku generowania i go zwróć:
                 $objTokenGenerationResult->success = true;
-                $objTokenGenerationResult->errorCode = "ET999";
+                $objTokenGenerationResult->errorCode = "ET099";
                 $objTokenGenerationResult->message = "Generowanie tokena zakończone pomyślnie.";
                 // Wpisanie do obiektu także wygenerowanego tokena:
                 $objTokenGenerationResult->token = $token;
