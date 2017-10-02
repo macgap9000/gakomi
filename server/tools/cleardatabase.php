@@ -12,23 +12,30 @@
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
     // Wyczyszczenie bazy:
-    $pdo->exec("
+    try
+    {
+        $pdo->exec("
+        
+                        DELETE FROM $db_name.resultmileage;
+                        DELETE FROM $db_name.resultroute;
+                        DELETE FROM $db_name.lines;
+                        DELETE FROM $db_name.cities;
+                        DELETE FROM $db_name.orders;
+                        
+                        ALTER TABLE $db_name.resultmileage AUTO_INCREMENT=1;
+                        ALTER TABLE $db_name.resultroute AUTO_INCREMENT=1;
+                        ALTER TABLE $db_name.lines AUTO_INCREMENT=1;
+                        ALTER TABLE $db_name.cities AUTO_INCREMENT=1;
+                        ALTER TABLE $db_name.orders AUTO_INCREMENT=1;
+        
+        ");
     
-                    DELETE FROM gakomi.resultmileage;
-                    DELETE FROM gakomi.resultroute;
-                    DELETE FROM gakomi.lines;
-                    DELETE FROM gakomi.cities;
-                    DELETE FROM gakomi.orders;
-                    
-                    ALTER TABLE gakomi.resultmileage AUTO_INCREMENT=1;
-                    ALTER TABLE gakomi.resultroute AUTO_INCREMENT=1;
-                    ALTER TABLE gakomi.lines AUTO_INCREMENT=1;
-                    ALTER TABLE gakomi.cities AUTO_INCREMENT=1;
-                    ALTER TABLE gakomi.orders AUTO_INCREMENT=1;
-    
-    ");
-
-    // Komunikat:
-    echo "Czyszczenie bazy zakończone!";
+        // Komunikat:
+        echo "Czyszczenie bazy <b>$db_name</b> zakończone!<br>";
+    }
+    catch (PDOException $ex)
+    {
+        echo "Wystąpił problem z czyszczeniem bazy. ".$ex->getMessage();
+    }
 
 ?>
