@@ -44,7 +44,7 @@
         <div id="navbar" class="collapse navbar-collapse">
           <ul class="nav navbar-nav">
             <li><a href="index.php">Start</a></li>
-            <li><a href="step1.php">Obliczenia</a></li>
+            <li><a href="stage1.php">Obliczenia</a></li>
             <li><a href="results.php">Wyniki</a></li>
             <li class="active"><a href="author.php">Autor</a></li>
           </ul>

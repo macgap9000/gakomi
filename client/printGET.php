@@ -5,9 +5,11 @@ echo '<b>$_GET:</b><br>';
 print_r($_GET);
 echo "</pre>";
 
+//echo "<br><br><br><br><br><br><br><br><br><br><br><br>";
+
 // header('Content-type: text/json');
 echo "<pre>";
-echo json_encode($_GET, JSON_PRETTY_PRINT);
+echo json_encode($_GET, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
 echo "</pre>";
 
 // ?>

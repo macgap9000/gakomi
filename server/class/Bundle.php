@@ -26,7 +26,7 @@
             public $mileage;
 
         // Definicja konstruktora obiektu:
-        public function __construkt()
+        public function __construct()
         {
             // Utworzony obiekt!
         }

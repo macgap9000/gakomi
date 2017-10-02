@@ -264,7 +264,7 @@
           Etap 1 &raquo; Etap 2 &raquo; Etap 3 &raquo; Etap 4 &raquo; <b>Etap 5</b>
         </div>
 
-        <form action="printGET.php" method="GET">
+        <form action="stage6.php" method="POST">
           <div class="panel panel-default">
               <div class="panel-heading">
                 <h3 class="panel-title">Podsumowanie</h3>

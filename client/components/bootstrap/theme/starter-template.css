@@ -5,3 +5,8 @@ body {
   padding: 40px 15px;
   text-align: center;
 }
+.tokenbox {
+  font-family: monospace;
+  font-weight: bold;
+  font-size: 1.3em;
+}
