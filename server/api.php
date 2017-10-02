@@ -398,8 +398,7 @@
             $response->errorCode = "EAPI0";
             $response->message = "Błąd API. Nieobsługiwana metoda HTTP. ". 
             "Dozwolone metody to: ".
-            "POST - dla przesyłania zleceń obliczeniowych ".
-            "oraz ".
+            "POST - dla przesyłania zleceń obliczeniowych oraz ".
             "GET - do przesyłania żądań odczytu zleceń razem z wynikami ".
             "(musi zawierać pole 'token').";
 
