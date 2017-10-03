@@ -255,7 +255,7 @@
           <div>
             <h1>Projekt Gakomi</h1>
             <p class="lead">
-                Wprowadź zbiór podstawowych informacji, koniecznych do przeprowadzenia obliczeń.<br>
+                Potwierdź wprowadzone przez Ciebie informacje.<br>
             </p>
           </div>
         </div>

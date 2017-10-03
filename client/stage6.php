@@ -306,6 +306,9 @@
     {
       // W odpowiedzi otrzymano także w obiekcie "sukces".
       // Można kontynuować dalsze działania.
+
+      // Wpisanie do zmiennej lokalnej informacji o tym, że przetworzono pomyślnie:
+      $state = "Przetworzono pomyślnie";
       
       // Przepisanie do zmiennej lokalnej otrzymanego kodu błędu:
       $errorCode = $response->errorCode;
@@ -325,6 +328,9 @@
       // W odpowiedzi pomimo kodu HTTP nie otrzymano sukcesu.
       // Wystąpił w takim wypadku nieznany błąd.
 
+      // Wpisanie do zmiennej lokalnej informacji o tym, że wystąpił błąd:
+      $state = "Błąd przetwarzania";
+
       // Przepisanie do zmiennej lokalnej otrzymanego kodu błędu:
       $errorCode = $response->errorCode;
 
@@ -339,6 +345,9 @@
   {
     // Otrzymano każdy dowolny inny kod HTTP niż 201.
     // Oznacza to, że wystąpił jakiś błąd - mniej lub bardziej poważny.
+
+    // Wpisanie do zmiennej lokalnej informacji o tym, że wystąpił błąd:
+    $state = "Błąd przetwarzania";
 
     // Przepisanie do zmiennej lokalnej otrzymanego kodu błędu:
     $errorCode = $response->errorCode;
@@ -385,8 +394,18 @@
       <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
     <![endif]-->
 
-    <!-- Podłączenie kodu JavaScript koniecznego do kopiowania tokena -->
-    <script src="stage6.js"></script>
+    <?php
+      // Podłączenie kodu JavaScript do obsługi funkcjonalności kopiowania tokena,
+      // w przypadku gdy zamówienie zostało zaaakceptowane i jego przetwarzanie zakończyło się sukcesem:
+      if ($orderAccepted == true)
+      {
+        echo '
+                <!-- Podłączenie kodu JavaScript koniecznego do kopiowania tokena -->
+                <script src="stage6.js"></script>
+        ';
+      }
+    ?>
+
   </head>
 
   <body>
@@ -419,7 +438,7 @@
           <div>
             <h1>Projekt Gakomi</h1>
             <p class="lead">
-                Wprowadź zbiór podstawowych informacji, koniecznych do przeprowadzenia obliczeń.<br>
+                Zapoznaj się z przygotowanymi dla Ciebie informacjami zwrotnymi.<br>
             </p>
           </div>
         </div>
@@ -436,49 +455,116 @@
               <div class="panel-body" style="padding-top:32px; padding-bottom:32px;">
               
                 <div class="form-group">
+                  <?php
+                    // Wyświetlenie właściwej treści w zależności od tego czy zamówienie
+                    // zostało zaakceptowane i jego przetwarzanie zakończyło się sukcesem:
+                    if ($orderAccepted == true)
+                    {
+                      // Zgłoszenie zaakceptowane. Wydrukuj na ekran informację o sukcesie:
+                      echo '
+                              <p>
+                                <b>Użytkowniku aplikacji Gakomi,</b><br>
+                                uprzejmie informujemy, iż przesłane przez Ciebie dane były prawidłowe. Obliczenie najkrótszej trasy
+                                dla komiwojażera zakończyło się powodzeniem. Poniżej został prezentowany Twój indywidualny żeton (ang. <i>token</i>),
+                                który umożliwi Ci późniejszy dostęp do Twojego zlecenia obliczeniowego i jego wyników.
+                              </p>
+                              <p>
+                                Przygotowany dla Ciebie token możesz skopiować do schowka poprzez naciśnięcie przycisku "Kopiuj token".
+                              </p>
+    
+                              <div class="input-group" style="margin-bottom: 10px;">
+                                <span class="input-group-addon" id="basic-addon1"><i class="glyphicon glyphicon-tag"></i></span>
+                                <input type="text" class="form-control tokenbox" placeholder="token" aria-describedby="basic-addon1" id="tokenbox" value="'.$token.'">
+                                <div class="input-group-btn">
+                                  <button type="button" class="btn btn-default" id="tokenbutton" onclick="copyTokenFromBox()">Kopiuj token</button>
+                                </div>
+                              </div>
+    
+                              <p>
+                                Po skopiowaniu tokena możesz udać się do zakładki <b><a href="results.php">Wyniki</a></b>, gdzie będziesz mógł go użyć by ujrzeć swoje wyniki.<br>
+                                Token jest wielokrotnego użytku i pozwala na wielokrotny dostęp do wyników, również w późniejszym czasie.<br>
+                              </p>
+    
+                              <p>
+                                Możesz również od razu obejrzeć swoje wyniki, klikając tutaj: <b><a href="result.php?token='.$token.'">pokaż wyniki</a></b>.
+                              </P>
+    
+                              <p>
+                                Kliknięcie przycisku <b>Zakończ</b> spowoduje przeniesienie Cię do strony powitalnej aplikacji.<br>
+                                Jeśli chcesz dodać kolejne zlecenie, naciśnij przycisk <b>Nowe zlecenie</b>.<br>
+                              </p>
+                      ';
+                    }
+                    else
+                    {
+                      // Zgłoszenie nie zostało zaakceptowane. Wystąpił błąd:
+                      echo '
+                              <p>
+                                <b>Użytkowniku aplikacji Gakomi,</b><br>
+                                uprzejmie informujemy, iż wystąpił błąd podczas realizacji Twojego zgłoszenia. Powodów takiego stanu rzeczy może być wiele, 
+                                np. przesył danych o nieprawidłowym typie lub formacie, problem z przeprowadzeniem obliczeń lub dostępem do bazy danych 
+                                lub problem z wygenerowaniem tokena dla zamówienia obliczeniowego złożonego przez Ciebie. 
+                                Aby dowiedzieć się więcej na temat błędu, który wystąpił, przeczytaj przygotowane dla Ciebie poniżej informacje.
+                              </p>                          
 
-                  <p>
-                    <b>Szanowny użytkowniku aplikacji Gakomi,</b><br>
-                    uprzejmie informujemy, iż przesłane przez Ciebie dane były prawidłowe. Obliczenie najkrótszej trasy
-                    dla komiwojażera zakończyło się powodzeniem. Poniżej został prezentowany Twój indywidualny żeton (ang. <i>token</i>),
-                    który umożliwi Ci późniejszy dostęp do Twojego zlecenia obliczeń i wyników.
-                  </p>
-                  <p>
-                    Przygotowany dla Ciebie token możesz skopiować do schowka poprzez naciśnięcie przycisku "Kopiuj token".
-                  </p>
-
-                  <div class="input-group" style="margin-bottom: 10px;">
-                    <span class="input-group-addon" id="basic-addon1"><i class="glyphicon glyphicon-tag"></i></span>
-                    <input type="text" class="form-control tokenbox" placeholder="token" aria-describedby="basic-addon1" id="tokenbox" value="1234567890abcdef">
-                    <div class="input-group-btn">
-                      <button type="button" class="btn btn-default" id="tokenbutton" onclick="copyTokenFromBox()">Kopiuj token</button>
-                    </div>
-                  </div>
-
-                  <p>
-                    Po jego skopiowaniu możesz się udać do zakładki <b><a href="results.php">Wyniki</a></b> i go tam wykorzystać by ujrzeć wyniki.<br>
-                    Token jest wielokrotnego użytku. Można dzięki niemu wielokrotnie oglądać wyniki. Róznież później.<br>
-                  </p>
-
-                  <p>
-                    Możesz również od razu obejrzeć swoje wyniki, klikając tutaj: <b><a href="result.php?token=">pokaż wyniki</a></b>.
-                  </P>
-
-                  <p>
-                    Kliknięcie przycisku <b>Zakończ</b> spowoduje przeniesienie Cię do strony powitalnej aplikacji.<br>
-                    Jeśli chcesz dodać kolejne zlecenie, naciśnij przycisk <b>Nowe zlecenie</b>.<br>
-                  </p>
-                </div>              
-
-                
-
+                              <div class="panel panel-default">
+                                <div class="panel-heading">
+                                  Informacja zwrotna od API
+                                </div>
+                                <table class="table table-bordered">
+                                  <tr>
+                                    <td style="max-width: 100px;">Stan:</td>
+                                    <td style="font-weight: bold;">'.$state.'</td>
+                                  </tr>
+                                  <tr>
+                                    <td style="max-width: 100px;">Kod błędu:</td>
+                                    <td style="font-weight: bold;">'.$errorCode.'</td>
+                                  </tr>
+                                  <tr>
+                                    <td style="max-width: 100px;">Treść komunikatu:</td>
+                                    <td style="font-weight: bold;">'.$message.'</td>
+                                  </tr>
+                                </table>
+                              </div>
+                              
+                              <p>
+                                Jeżeli Twoje zamówienie wymaga poprawienia wprowadzonych danych udaj się <b>Wstecz</b> i popraw dane a następnie spróbuj ponownie.<br> 
+                                Jeżeli problem będzie się powtarzał skontaktuj się z autorem programu.<br>
+                              </p>
+                              
+                              <p>
+                                Jeśli chcesz porzucić przetwarzanie tego zlecenia naciśnij przycisk <b>Porzuć zlecenie</b>.<br>
+                                Spowoduje to przekierowanie Cię do strony powitalnej aplikacji.<br>
+                              </p>
+                      ';
+                    }
+                  ?>
+                </div>
               </div>
               <div class="panel-footer">
                 <div style="float:left;">
                   <button type="button" class="btn btn-default btn-xs" onclick="javascript:history.back()"><i class="glyphicon glyphicon-menu-left"></i> Wstecz</button>
                 </div>
                 <div style="float:right;">
-                  <button type="submit" class="btn btn-default btn-xs">Dalej <i class="glyphicon glyphicon-menu-right"></i></button>
+                  <?php
+                    // Wyświetlenie właściwych przycisków akcji w zależności od tego czy zamówieni
+                    // zostąło zaakceptowane i jego przetwarzanie zakończyło się sukcesem:
+                    if ($orderAccepted == true)
+                    {
+                      // Zgłoszenie zaakceptowane. Wydrukuj na ekran informację o sukcesie:
+                      echo '
+                            <a href="stage1.php" class="btn btn-default btn-xs" role="button"><i class="glyphicon glyphicon-plus"></i> Nowe zlecenie</a>
+                            <a href="index.php" class="btn btn-default btn-xs" role="button"><i class="glyphicon glyphicon-flag"></i> Zakończ</a>
+                      ';                      
+                    }
+                    else
+                    {
+                      // Zgłoszenie nie zostało zaakceptowane. Wystąpił błąd:
+                      echo '
+                            <a href="index.php" class="btn btn-default btn-xs" role="button"><i class="glyphicon glyphicon-remove"></i> Porzuć zlecenie</a>  
+                      ';
+                    }
+                  ?>
                 </div>
                 <div style="clear:both;"></div>
               </div>
