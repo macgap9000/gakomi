@@ -61,23 +61,23 @@
                 działające w architekturze klient-serwer w oparciu o technologię REST.<br>
             </p>
         </div>
-        </div>
+      </div>
 
-        <div class="panel panel-default">
-            <div class="panel-heading">
-              <h3 class="panel-title">Komunikat powitalny</h3>
-            </div>
-            <div class="panel-body">
-              Witaj w aplikacji służącej do rozwiązywania problemu komiwojażera.<br>
-              Jej celem jest odnalezienie najkrótszej możliwej trasy, spośród wszystkich wprowadzonych punktów i odległości między nimi.<br>
-              <br>
-              Aby rozpocząć obliczenia, naciśnij przycisk "Obliczenia" znajdujący się w górnym menu, bądź <a href="stage1.php">kliknij tutaj</a>.<br>
-              Jeśli już wykonywałeś kiedyś obliczenia i chcesz zobaczyć ich wyniki, naciśnij przycisk "Wyniki" w górym menu, bądź <a href="results.php">kliknij tutaj</a>.<br>
-              <br>
-              Dziękuję za skorzystanie z aplikacji.<br>
-              Maciej Gapiński<br>
-            </div>
-        </div>
+      <div class="panel panel-default">
+          <div class="panel-heading">
+            <h3 class="panel-title">Komunikat powitalny</h3>
+          </div>
+          <div class="panel-body">
+            Witaj w aplikacji służącej do rozwiązywania problemu komiwojażera.<br>
+            Jej celem jest odnalezienie najkrótszej możliwej trasy, spośród wszystkich wprowadzonych punktów i odległości między nimi.<br>
+            <br>
+            Aby rozpocząć obliczenia, naciśnij przycisk "Obliczenia" znajdujący się w górnym menu, bądź <a href="stage1.php">kliknij tutaj</a>.<br>
+            Jeśli już wykonywałeś kiedyś obliczenia i chcesz zobaczyć ich wyniki, naciśnij przycisk "Wyniki" w górym menu, bądź <a href="results.php">kliknij tutaj</a>.<br>
+            <br>
+            Dziękuję za skorzystanie z aplikacji.<br>
+            Maciej Gapiński<br>
+          </div>
+      </div>
 
     </div><!-- /.container -->
 

@@ -21,7 +21,7 @@ function copyTokenFromBox()
         // Zmiany w tokenbuttonie w zależności od powodzenia operacji:
         if (isCopiedSuccessfully == true)
         {
-            // Wyrzucenie komunikatu o sukcesie kopiowania tokena do konsolu:
+            // Wyrzucenie komunikatu o sukcesie kopiowania tokena do konsoli:
             console.log('Token skopiowany pomyślnie!');
 
             // Ustawienie stylu buttona na sukces:
@@ -67,7 +67,7 @@ function setTokenbuttonToDefault()
     
     // Odznaczenie tokenboxa:
     tokenbox.blur();
-    // Ustawienie domyśłnego tekstu tokenbuttonowi:
+    // Ustawienie domyślnego tekstu tokenbuttonowi:
     tokenbutton.innerText = "Kopiuj token";
     // Ustawienie domyślnego koloru tokenbuttona:
     tokenbutton.className = "btn btn-default";

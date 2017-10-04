@@ -169,6 +169,11 @@
                 <h3 class="panel-title">Wprowadź nazwy miast</h3>
               </div>
               <div class="panel-body" style="padding-top:32px; padding-bottom:32px;">
+
+                <div class="form-group">
+                  <p style="font-weight:bold;">Dotychczas zgromadzone informacje:</p>
+                </div>                       
+
                 <div class="well">
                   Ilość wprowadzanych miast: <b><?php echo $numberOfCities; ?></b><br>
                 </div>

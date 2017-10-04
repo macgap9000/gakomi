@@ -254,6 +254,11 @@
                 <h3 class="panel-title">Wybierz miasto startowe</h3>
               </div>
               <div class="panel-body" style="padding-top:32px; padding-bottom:32px;">
+
+                <div class="form-group">
+                  <p style="font-weight:bold;">Dotychczas zgromadzone informacje:</p>
+                </div>         
+
                 <div class="well">
                   Ilość wprowadzonych miast: <b><?php echo $numberOfCities; ?></b>
                   <input type="hidden" name="numberOfCities" value="<?php if (isset($numberOfCities)) echo $numberOfCities; ?>"><br>

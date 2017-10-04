@@ -54,12 +54,92 @@
 
     <div class="container">
 
-      <div class="starter-template">
+      <div class="starter-template"  style="padding-bottom: 0px; !important;">
         <h1>Projekt Gakomi</h1>
         <p class="lead">
             Oprogramowanie rozwiązujące problem komiwojażera<br> 
             działające w architekturze klient-serwer w oparciu o technologię REST.<br>
         </p>
+      </div>
+
+      <div class="panel panel-default">
+          <div class="panel-heading">
+            <h3 class="panel-title">O autorze</h3>
+          </div>
+          <div class="panel-body">
+            <b>Autorem systemu Gakomi jest:</b><br>
+            <br>
+            Maciej Gapiński<br>
+            student II roku informatyki studiów magisterskich<br>
+            Wydziału Matematyki i Informatyki<br>
+            Uniwersytetu Łódzkiego<br>
+            <br>
+            <b>Kontakt z autorem systemu:</b><br>
+            <ul>
+              <li>mail: maciejgapinski90 [na] gmail.com</li>
+            </ul>
+            <br>
+            <b>Strona projektu:</b><br>
+            <ul>
+              <li style="word-wrap:break-word;">
+                <a href="https://github.com/macgap9000/gakomi" target="_blank">https://github.com/macgap9000/gakomi</a>
+              </li>
+            </ul>
+            <br>
+            <b>Wykorzystane technologie:</b>
+            <ul>
+              <li>
+                strona serwerowa:
+                <ul>
+                  <li>
+                    serwer aplikacyjny: XAMPP 5.6.12
+                    <ul>
+                      <li>Apache 2.4.16</li>
+                      <li>PHP 5.6.12 + cURL</li>
+                      <li>MySQL 5.6.26</li>
+                    </ul>
+                  </li>
+                  <li>
+                    wykorzystane oprogramowanie:
+                    <ul>
+                      <li>random_compat 2.0.10 (MIT)</li>
+                      <li>pc_permute (O'Reilly),<br> modified by dAngelov</li>
+                    </ul>
+                  </li>
+                </ul>
+              </li>
+              <li>
+                strona kliencka:
+                <ul>
+                  <li>
+                    wykorzystane oprogramowanie:
+                    <ul>
+                      <li>HTML5/CSS3 + Bootstrap</li>
+                      <li>JavaScript + jQuery</li>
+                    </ul>
+                  </li>                 
+                </ul>
+              </li>
+            </ul>
+            <br>
+            <b>Pozostałe informacje:</b>
+            <ul>
+              <li>
+                edytor kodu z obsługą Git:
+                <ul>
+                  <li>Visual Studio Code 1.15.1</li>
+                </ul>
+              </li>
+              <li>
+                dodatkowe oprogramowanie:
+                <ul>
+                  <li>Postman (Free/EULA)</li>
+                  <li>Fiddler (Free/EULA)</li>
+                </ul>
+              </li>
+            </ul>
+
+          </div>
       </div>
 
     </div><!-- /.container -->
