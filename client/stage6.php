@@ -165,11 +165,6 @@
     header('Location: stage3.php'.'?'.$query);
   }
 
-  // echo "<pre>";
-  // print_r($cities);
-  // print_r($lines);
-  // echo "</pre>";
-
 ?>
 
 <?php
@@ -486,7 +481,7 @@
                               </p>
     
                               <p>
-                                Możesz również od razu obejrzeć swoje wyniki, klikając tutaj: <b><a href="result.php?token='.$token.'">pokaż wyniki</a></b>.
+                                Możesz również od razu obejrzeć swoje wyniki, klikając tutaj: <b><a href="results.php?token='.$token.'">pokaż wyniki</a></b>.
                               </P>
     
                               <p>

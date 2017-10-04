@@ -111,11 +111,6 @@
     }
   }
 
-  // echo "<pre>";
-  // print_r($cities);
-  // print_r($lines);
-  // echo "</pre>";
-
 ?>
 
 <?php
@@ -182,13 +177,7 @@
       header('Location: stage4.php'.'?'.$query);
       exit();
     }
-
   }
-
-  // echo "<pre>";
-  // print_r($cities);
-  // print_r($lines);
-  // echo "</pre>";
 
 ?>
 

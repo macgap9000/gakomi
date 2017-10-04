@@ -149,11 +149,6 @@
     header('Location: stage3.php'.'?'.$query);
   }
 
-  // echo "<pre>";
-  // print_r($cities);
-  // print_r($lines);
-  // echo "</pre>";
-
 ?>
 
 <?php

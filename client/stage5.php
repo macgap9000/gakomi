@@ -149,11 +149,6 @@
     header('Location: stage3.php'.'?'.$query);
   }
 
-  // echo "<pre>";
-  // print_r($cities);
-  // print_r($lines);
-  // echo "</pre>";
-
 ?>
 
 <?php
@@ -337,9 +332,9 @@
 
                 <div class="form-group">
                   <p>Wszystkie niezbędne dane, konieczne do rozwiązania problemu komiwojażera zostały zebrane są gotowe do dalszego przetwarzania.</p>
-                  <p>Zostaną one specjalnie opakowane a następnie przesłane do serwera API wykonującego obliczenia.</b></p>
+                  <p>Zostaną one specjalnie opakowane a następnie przesłane do serwera API przyjmującego zlecenia obliczeniowe.</b></p>
                   <p>Upewnij się czy zostały one wpisane prawidłowo, gdyż w dalszym etapie poprawienie ich nie będzie możliwe.</p>
-                  <p>Aby kontynuować, naciśnij przycisk <b>Dalej</b></p>
+                  <p>Aby kontynuować, naciśnij przycisk <b>Prześlij zlecenie</b>.</p>
                 </div>
 
               </div>
@@ -348,7 +343,7 @@
                   <button type="button" class="btn btn-default btn-xs" onclick="javascript:history.back()"><i class="glyphicon glyphicon-menu-left"></i> Wstecz</button>
                 </div>
                 <div style="float:right;">
-                  <button type="submit" class="btn btn-default btn-xs">Dalej <i class="glyphicon glyphicon-menu-right"></i></button>
+                  <button type="submit" class="btn btn-default btn-xs"><i class="glyphicon glyphicon-send"></i> Prześlij zlecenie</button>
                 </div>
                 <div style="clear:both;"></div>
               </div>
